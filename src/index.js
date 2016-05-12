@@ -2,8 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import bot from './tgBot';
 import wit from './wit';
-import store from './store';
+import { createStore } from './store';
 import { addExpression, addOutcome } from './actionCreators';
+
+const store = createStore();
 
 bot.getMe()
     .then(data => console.log(data))

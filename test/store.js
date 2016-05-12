@@ -1,6 +1,8 @@
 import test from 'ava';
-import store from '../src/store';
+import { createStore } from '../src/store';
 import { addExpression, addOutcome } from '../src/actionCreators';
+
+const store = createStore();
 
 test('ADD_EXPRESSION action adds new expression to the state', t => {
     const initialState = store.getState();
