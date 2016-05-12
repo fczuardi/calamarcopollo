@@ -31,7 +31,7 @@ const updateArrayItem = (arr, i, newItem) => {
 };
 const reducer = (state = localInitialState, action) => {
     const { type, payload } = action;
-    const payloadText = payload.text || null;
+    const payloadText = payload && payload.text ? payload.text : null;
     const expressionIndex = state.expressions.findIndex(t => t === payloadText);
     const outcomeIndex = state.outcomes.findIndex(item => item.text === payloadText);
     switch (type) {
