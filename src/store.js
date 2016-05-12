@@ -6,22 +6,23 @@ import {
     ADD_OUTCOME
 } from './actionTypes';
 
-const initialState = {
+const emptyState = {
     chats: [],
     users: [],
     expressions: [],
     outcomes: []
 };
 
-let localInitialState = {};
+let parsedFileContents = null;
 try {
-    localInitialState = JSON.parse(fs.readFileSync(
-        path.join(__dirname, process.env.STATE_FILE),
-        'utf8'
-    ));
+    const filename = path.join(__dirname, process.env.STATE_FILE);
+    const fileContents = fs.readFileSync(filename, 'utf8');
+    parsedFileContents = JSON.parse(fileContents);
 } catch (e) {
-    localInitialState = initialState;
+    console.log('No local state present, starting with an empty one…');
 }
+
+const initialState = parsedFileContents || emptyState;
 
 const updateArrayItem = (arr, i, newItem) => {
     const shouldReplaceItem = (i > -1 && newItem !== null);
@@ -29,7 +30,7 @@ const updateArrayItem = (arr, i, newItem) => {
         ? [...arr.slice(0, i), newItem, ...arr.slice(i + 1)]
         : [newItem, ...arr];
 };
-const reducer = (state = localInitialState, action) => {
+const reducer = (state = initialState, action) => {
     const { type, payload } = action;
     const payloadText = payload && payload.text ? payload.text : null;
     const expressionIndex = state.expressions.findIndex(t => t === payloadText);
