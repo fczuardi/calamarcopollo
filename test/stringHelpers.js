@@ -2,7 +2,7 @@ import test from 'ava';
 import { dayStrings } from '../replies';
 import { dayString } from '../src/stringHelpers';
 
-test.only('dayString calculates today, tomorrow, day after tomorrow and other dates', t => {
+test('dayString calculates today, tomorrow, day after tomorrow and other dates', t => {
     const timestamp = new Date().getTime();
     const oneDay = 24 * 60 * 60 * 1000;
     const today = dayString(timestamp, dayStrings);
