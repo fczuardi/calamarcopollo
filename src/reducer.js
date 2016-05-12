@@ -1,6 +1,6 @@
 import {
-    ADD_EXPRESSION,
-    ADD_OUTCOME
+    UPDATE_EXPRESSION,
+    UPDATE_OUTCOME
 } from './actionTypes';
 
 const updateArrayItem = (arr, i, newItem) => {
@@ -16,14 +16,14 @@ export default function (state, action) {
     const expressionIndex = state.expressions.findIndex(t => t === payloadText);
     const outcomeIndex = state.outcomes.findIndex(item => item.text === payloadText);
     switch (type) {
-    case ADD_EXPRESSION:
+    case UPDATE_EXPRESSION:
         return {
             ...state,
             expressions: updateArrayItem(
                 state.expressions, expressionIndex, payloadText
             )
         };
-    case ADD_OUTCOME:
+    case UPDATE_OUTCOME:
         return {
             ...state,
             outcomes: updateArrayItem(

@@ -1,6 +1,6 @@
 import {
-    ADD_EXPRESSION,
-    ADD_OUTCOME
+    UPDATE_EXPRESSION,
+    UPDATE_OUTCOME
 } from './actionTypes';
 
 const basicCreator = type => payload => ({
@@ -10,10 +10,10 @@ const basicCreator = type => payload => ({
     }
 });
 
-const addExpression = basicCreator(ADD_EXPRESSION);
-const addOutcome = basicCreator(ADD_OUTCOME);
+const updateExpression = basicCreator(UPDATE_EXPRESSION);
+const updateOutcome = basicCreator(UPDATE_OUTCOME);
 
 export {
-    addExpression,
-    addOutcome
+    updateExpression,
+    updateOutcome
 };

@@ -1,29 +1,28 @@
 import test from 'ava';
 import { createStore } from '../src/store';
-import { addExpression, addOutcome } from '../src/actionCreators';
+import { updateExpression, updateOutcome } from '../src/actionCreators';
 
 const store = createStore();
 
-test('ADD_EXPRESSION action adds new expression to the state', t => {
+test('UPDATE_EXPRESSION action adds new expression to the state', t => {
     const initialState = store.getState();
     const text = `Foobar ${new Date().getTime()}`;
-    const addExpressionAction = addExpression({ text });
     const expectedNextState = {
         ...initialState,
         expressions: [text, ...initialState.expressions]
     };
-    store.dispatch(addExpressionAction);
-    t.deepEqual(expectedNextState, store.getState());
+    store.dispatch(updateExpression({ text }));
+    console.log(updateExpression({ text }));
+    t.deepEqual(expectedNextState.expressions, store.getState().expressions);
 });
 
-test('ADD_OUTCOME action adds new outcome to the state, or update if same text exists', t => {
+test('UPDATE_OUTCOME action adds new outcome to the state, or update if same text exists', t => {
     const initialState = store.getState();
     const text = `Foobar ${new Date().getTime()}`;
     const outcome = {
         text,
         entities: { foo: [{ type: 'value', value: 'bar' }] }
     };
-    const addOutcomeAction = addOutcome(outcome);
     const expectedNextState = {
         ...initialState,
         outcomes: [outcome, ...initialState.outcomes]
@@ -32,13 +31,12 @@ test('ADD_OUTCOME action adds new outcome to the state, or update if same text e
         text,
         entities: { bar: [{ type: 'value', value: 'foo' }] }
     };
-    const addOutcomeAction2 = addOutcome(outcome2);
     const expectedNextState2 = {
         ...initialState,
         outcomes: [outcome2, ...initialState.outcomes]
     };
-    store.dispatch(addOutcomeAction);
+    store.dispatch(updateOutcome(outcome));
     t.deepEqual(expectedNextState, store.getState());
-    store.dispatch(addOutcomeAction2);
+    store.dispatch(updateOutcome(outcome2));
     t.deepEqual(expectedNextState2, store.getState());
 });
