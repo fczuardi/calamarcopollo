@@ -1,11 +1,9 @@
-#!/usr/bin/env node
-
-const fs = require('fs');
-const path = require('path');
-const bot = require('./tgBot');
-const wit = require('./wit');
-const store = require('./store');
-const { addExpression, addOutcome } = require('./actionCreators');
+import fs from 'fs';
+import path from 'path';
+import bot from './tgBot';
+import wit from './wit';
+import store from './store';
+import { addExpression, addOutcome } from './actionCreators';
 
 bot.getMe()
     .then(data => console.log(data))

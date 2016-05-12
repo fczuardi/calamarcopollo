@@ -1,10 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const createStore = require('redux').createStore;
-const {
+import fs from 'fs';
+import path from 'path';
+import { createStore } from 'redux';
+import {
     ADD_EXPRESSION,
     ADD_OUTCOME
-} = require('./actionTypes');
+} from './actionTypes';
 
 const initialState = {
     chats: [],
@@ -60,4 +60,4 @@ const reducer = (state = localInitialState, action) => {
 
 const store = createStore(reducer);
 
-module.exports = store;
+export default store;

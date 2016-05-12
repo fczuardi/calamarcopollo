@@ -1,7 +1,7 @@
 const ADD_EXPRESSION = 'ADD_EXPRESSION';
 const ADD_OUTCOME = 'ADD_OUTCOME';
 
-module.exports = {
+export {
     ADD_EXPRESSION,
     ADD_OUTCOME
 };

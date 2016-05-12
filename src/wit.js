@@ -1,5 +1,4 @@
-const calamars = require('calamars');
-const WitDriver = calamars.WitDriver;
+import { WitDriver } from 'calamars';
 
 const options = {
     id: process.env.WIT_APP_ID,

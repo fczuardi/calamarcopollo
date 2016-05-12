@@ -1,7 +1,7 @@
-const {
+import {
     ADD_EXPRESSION,
     ADD_OUTCOME
-} = require('./actionTypes');
+} from './actionTypes';
 
 const basicCreator = type => payload => ({
     type,
@@ -13,7 +13,7 @@ const basicCreator = type => payload => ({
 const addExpression = basicCreator(ADD_EXPRESSION);
 const addOutcome = basicCreator(ADD_OUTCOME);
 
-module.exports = {
+export {
     addExpression,
     addOutcome
 };

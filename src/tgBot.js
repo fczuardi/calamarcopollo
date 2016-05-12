@@ -1,4 +1,4 @@
-const Telegram = require('telegram-bot-api');
+import Telegram from 'telegram-bot-api';
 
 const options = {
     token: process.env.TELEGRAM_TOKEN,
