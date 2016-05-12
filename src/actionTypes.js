@@ -1,0 +1,7 @@
+const ADD_EXPRESSION = 'ADD_EXPRESSION';
+const ADD_OUTCOME = 'ADD_OUTCOME';
+
+module.exports = {
+    ADD_EXPRESSION,
+    ADD_OUTCOME
+};
