@@ -28,7 +28,7 @@ bot.on('update', update => {
         const outcome = result.outcomes[0]
             ? { text: result._text, entities: result.outcomes[0].entities }
             : {};
-        console.log(outcome);
+        console.log(JSON.stringify(outcome));
         store.dispatch(updateOutcome(outcome));
     }).catch(err => console.error(err));
 });
