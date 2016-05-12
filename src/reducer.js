@@ -1,6 +1,7 @@
 import {
     UPDATE_EXPRESSION,
-    UPDATE_OUTCOME
+    UPDATE_OUTCOME,
+    UPDATE_CHAT_SESSION
 } from './actionTypes';
 
 const updateArrayItem = (arr, i, newItem) => {
@@ -12,15 +13,18 @@ const updateArrayItem = (arr, i, newItem) => {
 
 export default function (state, action) {
     const { type, payload } = action;
-    const payloadText = payload && payload.text ? payload.text : null;
-    const expressionIndex = state.expressions.findIndex(t => t === payloadText);
-    const outcomeIndex = state.outcomes.findIndex(item => item.text === payloadText);
+    const { text, chat } = payload || {};
+    const chatId = chat && chat.id ? chat.id : null;
+    const expressionIndex = state.expressions.findIndex(t => t === text);
+    const outcomeIndex = state.outcomes.findIndex(item => item.text === text);
+    const chatIndex = state.chats.findIndex(item => item.id === chatId);
+    const oldChat = chatIndex >= 0 ? state.chats[chatIndex] : null;;
     switch (type) {
     case UPDATE_EXPRESSION:
         return {
             ...state,
             expressions: updateArrayItem(
-                state.expressions, expressionIndex, payloadText
+                state.expressions, expressionIndex, text
             )
         };
     case UPDATE_OUTCOME:
@@ -28,6 +32,16 @@ export default function (state, action) {
             ...state,
             outcomes: updateArrayItem(
                 state.outcomes, outcomeIndex, payload
+            )
+        };
+    case UPDATE_CHAT_SESSION:
+        if (!chat.session) {
+            chat.session = oldChat.session || {};
+        }
+        return {
+            ...state,
+            chats: updateArrayItem(
+                state.chats, chatIndex, chat
             )
         };
     default:

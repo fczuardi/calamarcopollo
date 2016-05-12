@@ -4,7 +4,11 @@ import bot from './tgBot';
 import wit from './wit';
 import router from './router';
 import { createStore } from './store';
-import { updateExpression, updateOutcome } from './actionCreators';
+import {
+    updateExpression,
+    updateOutcome,
+    updateChatSession
+} from './actionCreators';
 
 const store = createStore();
 
@@ -23,19 +27,19 @@ bot.on('update', update => {
     }
     console.log(`Message: ${text}`);
     store.dispatch(updateExpression({ text }));
-    const chatId = chat.id;
+    store.dispatch(updateChatSession({ chat }));
     // const authorId = from.id;
     return wit.query(text, true).then(result => {
         const outcome = result.outcomes[0]
             ? { text: result._text, entities: result.outcomes[0].entities }
             : {};
+        const reply = router(outcome, store, chat);
         console.log(JSON.stringify(outcome));
-        const reply = router(outcome);
         store.dispatch(updateOutcome(outcome));
         if (typeof reply === 'string') {
             console.log('reply', reply);
             bot.sendMessage({
-                chat_id: chatId,
+                chat_id: chat.id,
                 text: reply
             });
         }
