@@ -1,4 +1,9 @@
+import moment from 'moment';
+import request from 'request-promise';
 import { replies } from '../replies';
+
+const CLICKBUS_URL = process.env.CLICKBUS_URL;
+
 const tripDialogReply = context => {
     const {
         origin,
@@ -9,9 +14,9 @@ const tripDialogReply = context => {
     } = context;
     const hasOrigin = origin !== undefined;
     const hasDestination = destination !== undefined;
-    const hasDay = departureDay !== undefined;
     const hasApiError = apiError !== undefined;
     const hasTrips = trips !== undefined;
+    const hasNoTrips = hasTrips && !trips.length;
     if (hasApiError) {
         return replies.apiError;
     }
@@ -25,13 +30,18 @@ const tripDialogReply = context => {
         return replies.trip.noOrigin;
     }
     if (hasDestination && hasOrigin && !hasTrips) {
+        const from = 'sao-paulo-tiete-sp';
+        const to = 'santos-sp';
+        const day = departureDay || moment();
+        const departure = moment(day).format('YYYY-MM-DD');
+        const url = `${CLICKBUS_URL}/trips?from=${from}&to=${to}&departure=${departure}`;
+        console.log(`requesting ${url}`);
+        return request(url);
+    }
+    if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
         return replies.trip.noTrips(origin, destination);
     }
-    if (hasDestination && hasOrigin && hasTrips && !hasDay) {
-        const day = Date.now();
-        return replies.trip.departureList(origin, destination, day, trips);
-    }
-    return replies.trip.departureList(origin, destination, departureDay, trips);
+    return replies.trip.departureList(origin, destination, departureDay, trips.length);
 };
 
 export { tripDialogReply };

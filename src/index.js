@@ -3,7 +3,9 @@ import { join as pathJoin } from 'path';
 import bot from './tgBot';
 import wit from './wit';
 import router from './router';
+import { replies } from '../replies';
 import { createStore } from './store';
+import { tripDialogReply } from './tripDialog';
 import {
     updateExpression,
     updateOutcome,
@@ -38,11 +40,64 @@ bot.on('update', update => {
         store.dispatch(updateOutcome(outcome));
         if (typeof reply === 'string') {
             console.log('reply', reply);
-            bot.sendMessage({
+            return bot.sendMessage({
                 chat_id: chat.id,
                 text: reply
             });
         }
+        if (typeof reply.then === 'function') {
+            const currentChat = store.getState().chats.find(item => item.id === chat.id);
+            const context = currentChat.session;
+            console.log('reply is a promise, context is:', JSON.stringify(context));
+            bot.sendMessage({
+                chat_id: chat.id,
+                text: replies.trip.requesting
+            });
+            return reply.then(body => {
+                console.log('reply arrived');
+                const result = JSON.parse(body);
+                const rawTrips = result.items;
+                console.log(`${rawTrips.length} trips`);
+                const trips = rawTrips.map(trip => {
+                    const firstPart = trip.parts[0];
+                    const {
+                        departure,
+                        arrival,
+                        busCompany,
+                        availableSeats
+                    } = firstPart;
+                    const departureDay = departure.waypoint.schedule.date;
+                    const departureTime = departure.waypoint.schedule.time;
+                    const arrivalDay = arrival.waypoint.schedule.time;
+                    const arrivalTime = arrival.waypoint.schedule.time;
+                    const busCompanyName =  busCompany.name
+                    return {
+                        departureDay,
+                        departureTime,
+                        arrivalDay,
+                        arrivalTime,
+                        busCompanyName,
+                        availableSeats,
+                    }
+                });
+                console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
+                let nextContext = Object.assign({}, context, {trips: trips});
+                const reply = tripDialogReply(nextContext);
+                return bot.sendMessage({
+                    chat_id: chat.id,
+                    text: reply
+                });
+            }).catch(err => {
+                console.error(err);
+                let nextContext = Object.assign({}, context, {apiError: true});
+                const reply = tripDialogReply(nextContext);
+                return bot.sendMessage({
+                    chat_id: chat.id,
+                    text: reply
+                });
+            });
+        }
+        console.log('what is this?', reply);
     }).catch(err => console.error(err));
 });
 
