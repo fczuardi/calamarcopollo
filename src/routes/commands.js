@@ -16,8 +16,7 @@ const routes = [[
     replies.help
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'restart',
-    (outcomes, store, chat) => {
-        console.log('reset chat session', chat);
+    (outcomes, { store, chat }) => {
         store.dispatch(updateChatSession({ chat: { ...chat, session: {} } }));
         return replies.restart;
     }

@@ -2,14 +2,16 @@ import { createRouter, WitDriver } from 'calamars';
 import { tripDialogReply } from './tripDialog';
 import { updateChatSession } from './actionCreators';
 import commandRoutes from './routes/commands';
+import interactionRoutes from './routes/interactions';
 
 const { getEntity, getEntityValue, getEntityMeta } = WitDriver;
 
 const routes = [
     ...commandRoutes,
+    ...interactionRoutes,
     [
         outcomes => getEntityValue(outcomes, 'trip') === 'info',
-        (outcomes, store, chat) => {
+        (outcomes, { store, chat }) => {
             const context = chat.session;
             const origin = getEntity(outcomes, 'origin');
             const destination = getEntity(outcomes, 'destination');
@@ -35,7 +37,7 @@ const routes = [
             getEntityValue(outcomes, 'origin') ||
             getEntityValue(outcomes, 'destination'
         ))),
-        (outcomes, store, chat) => {
+        (outcomes, { store, chat }) => {
             const context = chat.session;
             const place = getEntity(outcomes, 'places') ||
                             getEntity(outcomes, 'origin') ||

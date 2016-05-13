@@ -20,7 +20,7 @@ bot.getMe()
 bot.on('update', update => {
     const { message } = update;
     // const { date, text, chat, from } = message;
-    const { text, chat } = message;
+    const { text, chat, from } = message;
     if (!text) {
         console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
         return null;
@@ -33,7 +33,7 @@ bot.on('update', update => {
         const outcome = result.outcomes[0]
             ? { text: result._text, entities: result.outcomes[0].entities }
             : {};
-        const reply = router(outcome, store, chat);
+        const reply = router(outcome, { store, chat, from });
         console.log(JSON.stringify(outcome));
         store.dispatch(updateOutcome(outcome));
         if (typeof reply === 'string') {
