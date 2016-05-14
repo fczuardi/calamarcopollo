@@ -13,6 +13,7 @@ const replies = {
     help: 'Tente consultar um horário de ônibus, por exemplo: horários de São Paulo para Rio de Janeiro',
     start: 'AVISO: Você está conversando com uma versão de desenvolvimento do bot "calamarcopollo" e qualquer frase que você digitar pode ficar publicamente logada na web. Portanto não digite nada privado para este bot. DICA: sempre que quiser recomeçar a interação do zero, digite /restart',
     restart: 'OK, vamos recomeçar do zero.',
+    // ## Insult
     insult: 'Eu sou um robô e meu trabalho é servir, faço o possível mas nem sempre acerto… pode extravazar seu descontentamento em mim, eu mereço.',
     // ## Interactions
     greeting: {
