@@ -1,12 +1,14 @@
 import { createRouter } from 'calamars';
 import commandRoutes from './routes/commands';
 import interactionRoutes from './routes/interactions';
+import faqRoutes from './routes/faq';
 import tripRoutes from './routes/trips';
 import insultRoutes from './routes/insult';
 
 const routes = [
     ...commandRoutes,
     ...interactionRoutes,
+    ...faqRoutes,
     ...tripRoutes,
     ...insultRoutes
 ];

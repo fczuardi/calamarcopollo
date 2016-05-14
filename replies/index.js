@@ -1,4 +1,5 @@
 import { dayString } from '../src/stringHelpers';
+const faqAnswers = require('../answers.json');
 
 const dayStrings = {
     today: 'hoje',
@@ -21,6 +22,11 @@ const replies = {
         username: username => `Olá ${username}, em que posso ajudar?`
     },
     close: '👍',
+    // ## FAQ
+    faq: value => {
+        const selectedAnswer = faqAnswers.find(answer => answer.value === value);
+        return selectedAnswer ? selectedAnswer.response : null;
+    },
     // ## Trip
     trip: {
         noPlaces: 'Certo… preciso saber da origem e do destino',
