@@ -3,6 +3,8 @@ import { tripDialogReply } from '../tripDialog';
 import { WitDriver } from 'calamars';
 const { getEntity, getEntityValue, getEntityMeta } = WitDriver;
 
+const placesConfidenceThreshold = 0.7;
+
 const routes = [[
     outcomes => getEntityValue(outcomes, 'trip') === 'info',
     (outcomes, { store, chat }) => {
@@ -11,10 +13,10 @@ const routes = [[
         const destination = getEntity(outcomes, 'destination');
         let nextContext = Object.assign({}, context);
         console.log('tripInfo intent', context);
-        if (destination) {
+        if (destination && origin.confidence >= placesConfidenceThreshold) {
             nextContext.destination = destination.value;
         }
-        if (origin) {
+        if (origin && origin.confidence >= placesConfidenceThreshold) {
             nextContext.origin = origin.value;
         }
         console.log(getEntityMeta(destination));
@@ -35,6 +37,9 @@ const routes = [[
         const place = getEntity(outcomes, 'places') ||
                         getEntity(outcomes, 'origin') ||
                         getEntity(outcomes, 'destination');
+        if (place.confidence < placesConfidenceThreshold) {
+            return null;
+        }
         let nextContext = Object.assign({}, context);
         if (nextContext.destination && !nextContext.origin) {
             nextContext.origin = place.value;
