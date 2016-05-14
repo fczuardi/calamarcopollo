@@ -22,7 +22,6 @@ const routes = [[
         store.dispatch(updateChatSession({
             chat: { ...chat, session: nextContext }
         }));
-        // TODO api call if the required parameters are on the context
         return tripDialogReply(nextContext);
     }
 ], [
@@ -37,20 +36,18 @@ const routes = [[
                         getEntity(outcomes, 'origin') ||
                         getEntity(outcomes, 'destination');
         let nextContext = Object.assign({}, context);
-        if (
-            (nextContext.destination && !nextContext.origin) ||
+        if (nextContext.destination && !nextContext.origin) {
+            nextContext.origin = place.value;
+        } else if (
+            (!nextContext.destination && nextContext.origin) ||
             (!nextContext.destination && !nextContext.origin)
         ) {
-            console.log('Por que??', nextContext.destination, nextContext.origin);
-            nextContext.origin = place.value;
-        } else if (!nextContext.destination && nextContext.origin) {
             nextContext.destination = place.value;
         }
         console.log('nextContext: ', nextContext);
         store.dispatch(updateChatSession({
             chat: { ...chat, session: nextContext }
         }));
-        // TODO api call if the required parameters are on the context
         return tripDialogReply(nextContext);
     }
 ]];
