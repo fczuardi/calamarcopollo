@@ -13,7 +13,7 @@ const routes = [[
         const destination = getEntity(outcomes, 'destination');
         let nextContext = Object.assign({}, context);
         console.log('tripInfo intent', context);
-        if (destination && origin.confidence >= placesConfidenceThreshold) {
+        if (destination && destination.confidence >= placesConfidenceThreshold) {
             nextContext.destination = destination.value;
         }
         if (origin && origin.confidence >= placesConfidenceThreshold) {
@@ -37,9 +37,6 @@ const routes = [[
         const place = getEntity(outcomes, 'places') ||
                         getEntity(outcomes, 'origin') ||
                         getEntity(outcomes, 'destination');
-        if (place.confidence < placesConfidenceThreshold) {
-            return null;
-        }
         let nextContext = Object.assign({}, context);
         if (nextContext.destination && !nextContext.origin) {
             nextContext.origin = place.value;
