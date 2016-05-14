@@ -45,9 +45,9 @@ bot.on('update', update => {
                 text: reply
             });
         }
-        if (typeof reply.then === 'function') {
-            const currentChat = store.getState().chats.find(item => item.id === chat.id);
-            const context = currentChat.session;
+        const currentChat = store.getState().chats.find(item => item.id === chat.id);
+        const context = currentChat.session;
+        if (reply && typeof reply.then === 'function') {
             console.log('reply is a promise, context is:', JSON.stringify(context));
             bot.sendMessage({
                 chat_id: chat.id,
@@ -55,8 +55,8 @@ bot.on('update', update => {
             });
             return reply.then(body => {
                 console.log('reply arrived');
-                const result = JSON.parse(body);
-                const rawTrips = result.items;
+                const apiResult = JSON.parse(body);
+                const rawTrips = apiResult.items;
                 console.log(`${rawTrips.length} trips`);
                 const trips = rawTrips.map(trip => {
                     const firstPart = trip.parts[0];
@@ -70,34 +70,41 @@ bot.on('update', update => {
                     const departureTime = departure.waypoint.schedule.time;
                     const arrivalDay = arrival.waypoint.schedule.time;
                     const arrivalTime = arrival.waypoint.schedule.time;
-                    const busCompanyName =  busCompany.name
+                    const busCompanyName = busCompany.name;
                     return {
                         departureDay,
                         departureTime,
                         arrivalDay,
                         arrivalTime,
                         busCompanyName,
-                        availableSeats,
-                    }
+                        availableSeats
+                    };
                 });
                 console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
-                let nextContext = Object.assign({}, context, {trips: trips});
-                const reply = tripDialogReply(nextContext);
+                const nextContext = Object.assign({}, context, { trips });
+                const secondReply = tripDialogReply(nextContext);
                 return bot.sendMessage({
                     chat_id: chat.id,
-                    text: reply
+                    text: secondReply
                 });
             }).catch(err => {
                 console.error(err);
-                let nextContext = Object.assign({}, context, {apiError: true});
-                const reply = tripDialogReply(nextContext);
+                const nextContext = Object.assign({}, context, { apiError: true });
+                const errorReply = tripDialogReply(nextContext);
                 return bot.sendMessage({
                     chat_id: chat.id,
-                    text: reply
+                    text: errorReply
                 });
             });
         }
         console.log('what is this?', reply);
+        return bot.sendMessage({
+            chat_id: chat.id,
+            text: replies.unknown(
+                `context: ${JSON.stringify(context)}
+                outcome: ${JSON.stringify(outcome)}`
+            )
+        });
     }).catch(err => console.error(err));
 });
 

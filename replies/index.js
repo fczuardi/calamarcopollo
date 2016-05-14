@@ -31,7 +31,9 @@ const replies = {
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
         departureList: (origin, destination, day, optionsSize) =>
             `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções:`
-    }
+    },
+    // ## Unexpected answer
+    unknown: debug => `Vixe, me confundi. ${debug}`
 };
 /* eslint-enable max-len */
 
