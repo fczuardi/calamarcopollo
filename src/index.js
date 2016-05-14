@@ -27,7 +27,8 @@ bot.on('update', update => {
         console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
         return null;
     }
-    console.log(`Message: ${text}`);
+    console.log(`
+        Message: ${text}`);
     store.dispatch(updateExpression({ text }));
     store.dispatch(updateChatSession({ chat }));
     // const authorId = from.id;
