@@ -43,8 +43,12 @@ const replies = {
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
         noTripsWithUrl: (origin, destination, url) =>
             `Meu acesso ainda é limitado e não consegui encontrar viagens de ${origin} para ${destination}, tente aqui: ${url}`,
+        filteredDepartureListAfter: (origin, destination, day, optionsSize) =>
+            `De ${origin} para ${destination} ${dayString(day, dayStrings)} depois das ${day.format('HH:mm')} tenho ${optionsSize} ${optionsSize > 1 ? 'opções' : 'opção'}.`,
+        filteredDepartureListBetween: (origin, destination, from, to, optionsSize) =>
+            `De ${origin} para ${destination} ${dayString(from, dayStrings)} entre ${from.format('HH:mm')} e ${to.format('HH:mm')} tenho ${optionsSize} ${optionsSize > 1 ? 'opções' : 'opção'}.`,
         departureList: (origin, destination, day, optionsSize) =>
-            `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções:`
+            `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções.`
     },
     // ## Unexpected answer
     unknown: debug => `Vixe, me confundi. ${debug}`

@@ -11,7 +11,7 @@ const tripDialogReply = context => {
         originMeta,
         destination,
         destinationMeta,
-        departureDay,
+        timeFilter,
         apiError,
         trips
     } = context;
@@ -43,8 +43,9 @@ const tripDialogReply = context => {
         }
         const from = originMeta.slugs[0];
         const to = destinationMeta.slugs[0];
-        const day = departureDay || moment();
-        const departure = moment(day).format('YYYY-MM-DD');
+        const day = timeFilter && timeFilter.from
+            ? moment(timeFilter.from.value) : moment();
+        const departure = day.format('YYYY-MM-DD');
         const url = `${CLICKBUS_URL}/trips?from=${from}&to=${to}&departure=${departure}`;
         console.log(`requesting ${url}`);
         return request(url);
@@ -58,7 +59,34 @@ const tripDialogReply = context => {
         const url = `${CLICKBUS_WEB_URL}/${from}/${to}/`;
         return replies.trip.noTripsWithUrl(origin, destination, url);
     }
-    return replies.trip.departureList(origin, destination, departureDay, trips.length);
+    if (hasDestination && hasOrigin && hasTrips && timeFilter.from && timeFilter.from.grain !== 'day') {
+        const filteredTripsAfter = trips.filter(trip =>
+            trip.departureTime.isAfter(timeFilter.from.value)
+        );
+        if (timeFilter.to === null) {
+            return replies.trip.filteredDepartureListAfter(
+                origin,
+                destination,
+                moment(timeFilter.from.value),
+                filteredTripsAfter.length
+            );
+        }
+        const filteredTripsBetween = filteredTripsAfter.filter(trip =>
+            trip.departureTime.isBefore(timeFilter.to.value)
+        );
+        console.log('timeFilter.from.value', timeFilter.from.value);
+        console.log('timeFilter.to.value', timeFilter.to.value);
+        return replies.trip.filteredDepartureListBetween(
+            origin,
+            destination,
+            moment(timeFilter.from.value),
+            moment(timeFilter.to.value),
+            filteredTripsBetween.length
+        );
+    }
+    const day = timeFilter && timeFilter.from ? moment(timeFilter.from) : moment();
+    const departure = day.format('YYYY-MM-DD');
+    return replies.trip.departureList(origin, destination, departure, trips.length);
 };
 
 export { tripDialogReply };
