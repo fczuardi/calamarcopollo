@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { writeFileSync } from 'fs';
 import { join as pathJoin } from 'path';
 import bot from './tgBot';
@@ -67,16 +68,19 @@ bot.on('update', update => {
                         busCompany,
                         availableSeats
                     } = firstPart;
-                    const departureDay = departure.waypoint.schedule.date;
-                    const departureTime = departure.waypoint.schedule.time;
-                    const arrivalDay = arrival.waypoint.schedule.time;
-                    const arrivalTime = arrival.waypoint.schedule.time;
+                    const beginTime = departure.waypoint.schedule;
+                    const endTime = arrival.waypoint.schedule;
+                    const departureTime = moment(`${beginTime.date} ${beginTime.time}.000-03`);
+                    const arrivalTime = moment(`${endTime.date} ${endTime.time}.000-03`);
+                    const duration = arrivalTime.diff(departureTime, 'minutes');
                     const busCompanyName = busCompany.name;
+                    console.log(
+`${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration}`
+                    );
                     return {
-                        departureDay,
                         departureTime,
-                        arrivalDay,
                         arrivalTime,
+                        duration,
                         busCompanyName,
                         availableSeats
                     };
