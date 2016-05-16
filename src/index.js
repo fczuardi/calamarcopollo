@@ -51,9 +51,20 @@ bot.on('update', update => {
         const context = currentChat.session;
         if (reply && typeof reply.then === 'function') {
             console.log('reply is a promise, context is:', JSON.stringify(context));
+            const replyText = !context.timeFilter
+                ? replies.trip.requesting(context.origin, context.destination)
+                : context.timeFilter.from.grain === 'day'
+                    ? replies.trip.requestingWithDay(
+                        context.origin, context.destination,
+                        moment(context.timeFilter.from.value)
+                    ) : replies.trip.requestingWithDayAndTime(
+                        context.origin, context.destination,
+                        moment(context.timeFilter.from.value),
+                        context.timeFilter.to ? moment(context.timeFilter.to.value) : null
+                    );
             bot.sendMessage({
                 chat_id: chat.id,
-                text: replies.trip.requesting(context.origin, context.destination)
+                text: replyText
             });
             return reply.then(body => {
                 console.log('reply arrived');

@@ -13,10 +13,10 @@ const extractEntities = outcomes => {
     const destinationMeta = getEntityMeta(destination);
     const dateTime = getEntity(outcomes, 'datetime');
     console.log('dateTime', dateTime);
-    const timeFilter = {
+    const timeFilter = dateTime ? {
         from: !dateTime.from ? dateTime : dateTime.from,
         to: dateTime.to ? dateTime.to : null
-    };
+    } : null;
     return {
         unknownPlace,
         origin,

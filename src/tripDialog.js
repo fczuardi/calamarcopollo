@@ -59,7 +59,7 @@ const tripDialogReply = context => {
         const url = `${CLICKBUS_WEB_URL}/${from}/${to}/`;
         return replies.trip.noTripsWithUrl(origin, destination, url);
     }
-    if (hasDestination && hasOrigin && hasTrips && timeFilter.from && timeFilter.from.grain !== 'day') {
+    if (hasDestination && hasOrigin && hasTrips && timeFilter && timeFilter.from && timeFilter.from.grain !== 'day') {
         const filteredTripsAfter = trips.filter(trip =>
             trip.departureTime.isAfter(timeFilter.from.value)
         );
