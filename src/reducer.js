@@ -36,7 +36,7 @@ export default function (state, action) {
         };
     case UPDATE_CHAT_SESSION:
         if (!chat.session) {
-            chat.session = oldChat.session || {};
+            chat.session = oldChat && oldChat.session ? oldChat.session : {};
         }
         return {
             ...state,
