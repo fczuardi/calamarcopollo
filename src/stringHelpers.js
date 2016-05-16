@@ -7,7 +7,7 @@ const dayString = (d, dayStrings) => {
         today.clone().startOf('day'),
         today.clone().endOf('day')
     );
-    const diff = day.diff(today, 'days');
+    const diff = day.clone().endOf('day').diff(today.clone().endOf('day'), 'days');
     if (isToday) {
         return dayStrings.today;
     }
