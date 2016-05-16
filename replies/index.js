@@ -41,6 +41,8 @@ const replies = {
         apiError: 'Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte.',
         noTrips: (origin, destination) =>
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
+        noTripsWithUrl: (origin, destination, url) =>
+            `Meu acesso ainda é limitado e não consegui encontrar viagens de ${origin} para ${destination}, tente aqui: ${url}`,
         departureList: (origin, destination, day, optionsSize) =>
             `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções:`
     },

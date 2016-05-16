@@ -89,6 +89,7 @@ bot.on('update', update => {
                 const nextContext = Object.assign({}, context, { trips });
                 const secondReply = tripDialogReply(nextContext);
                 return bot.sendMessage({
+                    disable_web_page_preview: 'true',
                     chat_id: chat.id,
                     text: secondReply
                 });

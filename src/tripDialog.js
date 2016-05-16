@@ -3,6 +3,7 @@ import request from 'request-promise';
 import { replies } from '../replies';
 
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
+const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
 
 const tripDialogReply = context => {
     const {
@@ -49,7 +50,13 @@ const tripDialogReply = context => {
         return request(url);
     }
     if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
-        return replies.trip.noTrips(origin, destination);
+        if (!originMeta || !destinationMeta) {
+            return replies.trip.noTrips(origin, destination);
+        }
+        const from = originMeta.slugs[0];
+        const to = destinationMeta.slugs[0];
+        const url = `${CLICKBUS_WEB_URL}/${from}/${to}/`;
+        return replies.trip.noTripsWithUrl(origin, destination, url);
     }
     return replies.trip.departureList(origin, destination, departureDay, trips.length);
 };
