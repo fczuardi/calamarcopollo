@@ -52,7 +52,7 @@ bot.on('update', update => {
             console.log('reply is a promise, context is:', JSON.stringify(context));
             bot.sendMessage({
                 chat_id: chat.id,
-                text: replies.trip.requesting
+                text: replies.trip.requesting(context.origin, context.destination)
             });
             return reply.then(body => {
                 console.log('reply arrived');
