@@ -35,7 +35,9 @@ const replies = {
         noDestination: 'E qual o destino?',
         noOrigin: 'Saindo de onde?',
         requesting: (origin, destination) =>
-        `Só um minuto, vou buscar aqui… (${origin} > ${destination})`,
+        `Só um minuto, vou buscar aqui… (${origin} 🚌 ${destination})`,
+        noSlug: place =>
+        `Infelizmente ${place} é uma localidade que eu não conheço.`,
         apiError: 'Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte.',
         noTrips: (origin, destination) =>
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
