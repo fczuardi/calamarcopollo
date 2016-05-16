@@ -5,6 +5,8 @@ import { replies } from '../replies';
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
 const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
 
+const tripListSizeThreshold = 10;
+
 const tripDialogReply = context => {
     const {
         origin,
@@ -50,43 +52,74 @@ const tripDialogReply = context => {
         console.log(`requesting ${url}`);
         return request(url);
     }
-    if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
-        if (!originMeta || !destinationMeta) {
-            return replies.trip.noTrips(origin, destination);
-        }
-        const from = originMeta.slugs[0];
-        const to = destinationMeta.slugs[0];
-        const url = `${CLICKBUS_WEB_URL}/${from}/${to}/`;
-        return replies.trip.noTripsWithUrl(origin, destination, url);
+    if (!originMeta || !destinationMeta) {
+        return replies.trip.noTrips(origin, destination);
     }
-    if (hasDestination && hasOrigin && hasTrips && timeFilter && timeFilter.from && timeFilter.from.grain !== 'day') {
+    const from = originMeta.slugs[0];
+    const to = destinationMeta.slugs[0];
+    const webUrl = `${CLICKBUS_WEB_URL}/${from}/${to}/`;
+    if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
+        return replies.trip.noTripsWithUrl(origin, destination, webUrl);
+    }
+    if (hasDestination && hasOrigin && hasTrips && timeFilter &&
+                timeFilter.from && timeFilter.from.grain !== 'day') {
         const filteredTripsAfter = trips.filter(trip =>
             trip.departureTime.isAfter(timeFilter.from.value)
         );
         if (timeFilter.to === null) {
+            const tripListAfter = filteredTripsAfter.map(trip => {
+                const departure = moment(trip.departureTime).format('DD/MM HH:mm');
+                const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
+                const company = trip.busCompanyName;
+                const seats = trip.availableSeats;
+                return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`
+            }).join('\n');
             return replies.trip.filteredDepartureListAfter(
                 origin,
                 destination,
                 moment(timeFilter.from.value),
-                filteredTripsAfter.length
+                filteredTripsAfter.length,
+                webUrl,
+                (filteredTripsAfter.length < tripListSizeThreshold) ? tripListAfter : null
             );
         }
         const filteredTripsBetween = filteredTripsAfter.filter(trip =>
             trip.departureTime.isBefore(timeFilter.to.value)
         );
-        console.log('timeFilter.from.value', timeFilter.from.value);
-        console.log('timeFilter.to.value', timeFilter.to.value);
+        const tripListBetween = filteredTripsBetween.map(trip => {
+            const departure = moment(trip.departureTime).format('DD/MM HH:mm');
+            const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
+            const company = trip.busCompanyName;
+            const seats = trip.availableSeats;
+            return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`
+        }).join('\n');
         return replies.trip.filteredDepartureListBetween(
             origin,
             destination,
             moment(timeFilter.from.value),
             moment(timeFilter.to.value),
-            filteredTripsBetween.length
+            filteredTripsBetween.length,
+            webUrl,
+            (filteredTripsBetween.length < tripListSizeThreshold) ? tripListBetween : null
         );
     }
     const day = timeFilter && timeFilter.from ? moment(timeFilter.from) : moment();
     const departure = day.format('YYYY-MM-DD');
-    return replies.trip.departureList(origin, destination, departure, trips.length);
+    const tripList = trips.map(trip => {
+        const departure = moment(trip.departureTime).format('DD/MM HH:mm');
+        const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
+        const company = trip.busCompanyName;
+        const seats = trip.availableSeats;
+        return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`
+    }).join('\n');
+    return replies.trip.departureList(
+        origin,
+        destination,
+        departure,
+        trips.length,
+        webUrl,
+        trips.length < tripListSizeThreshold ? tripList : null
+    );
 };
 
 export { tripDialogReply };
