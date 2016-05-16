@@ -23,11 +23,14 @@ bot.getMe()
 bot.on('update', update => {
     const { message } = update;
     // const { date, text, chat, from } = message;
-    const { text, chat, from } = message;
-    if (!text) {
+    const { chat, from } = message;
+    const messageText = message.text;
+    if (!messageText) {
         console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
         return null;
     }
+
+    const text = messageText.replace(/^@[^ ]* /, ''); // remove botusername
     console.log(`
         Message: ${text}`);
     store.dispatch(updateExpression({ text }));
