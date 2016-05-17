@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { writeFileSync, appendFile } from 'fs';
 import { join as pathJoin } from 'path';
+import latinize from 'latinize';
 import bot from './tgBot';
 import wit from './wit';
 import router from './router';
@@ -31,9 +32,12 @@ bot.on('update', update => {
         return null;
     }
 
-    const text = messageText.replace(/^@[^ ]* /, ''); // remove botusername
+    const text = latinize(
+        messageText.replace(/^@[^ ]* /, '') // remove botusername
+    ).toLowerCase();
     console.log(`
-        Message: ${text}`);
+        Message: ${messageText}
+                 ${text}`);
     store.dispatch(updateExpression({ text }));
     store.dispatch(updateChatSession({ chat, date }));
 

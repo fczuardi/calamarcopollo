@@ -48,6 +48,7 @@
   "dependencies": {
     "calamars": "^0.8.8",
     "fake-clickbus-api": "^0.1.31",
+    "latinize": "^0.2.0",
     "moment": "^2.13.0",
     "redux": "^3.5.2",
     "telegram-bot-api": "^1.1.0"

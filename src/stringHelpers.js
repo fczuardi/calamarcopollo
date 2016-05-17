@@ -2,7 +2,7 @@ import moment from 'moment';
 
 const dayString = (d, dayStrings) => {
     const day = moment(d);
-    const today = moment().utc().subtract(3, 'hours');;
+    const today = moment().utc().subtract(3, 'hours');
     const isToday = day.isBetween(
         today.clone().startOf('day'),
         today.clone().endOf('day')
