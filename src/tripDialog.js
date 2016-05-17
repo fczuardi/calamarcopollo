@@ -72,7 +72,7 @@ const tripDialogReply = context => {
                 const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
                 const company = trip.busCompanyName;
                 const seats = trip.availableSeats;
-                return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`
+                return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`;
             }).join('\n');
             return replies.trip.filteredDepartureListAfter(
                 origin,
@@ -91,7 +91,7 @@ const tripDialogReply = context => {
             const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
             const company = trip.busCompanyName;
             const seats = trip.availableSeats;
-            return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`
+            return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`;
         }).join('\n');
         return replies.trip.filteredDepartureListBetween(
             origin,
@@ -103,15 +103,15 @@ const tripDialogReply = context => {
             (filteredTripsBetween.length < tripListSizeThreshold) ? tripListBetween : null
         );
     }
-    const day = timeFilter && timeFilter.from ? moment(timeFilter.from) : moment();
-    const departure = day.format('YYYY-MM-DD');
     const tripList = trips.map(trip => {
         const departure = moment(trip.departureTime).format('DD/MM HH:mm');
         const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
         const company = trip.busCompanyName;
         const seats = trip.availableSeats;
-        return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`
+        return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`;
     }).join('\n');
+    const day = timeFilter && timeFilter.from ? moment(timeFilter.from) : moment();
+    const departure = day.format('YYYY-MM-DD');
     return replies.trip.departureList(
         origin,
         destination,
