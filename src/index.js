@@ -22,8 +22,7 @@ bot.getMe()
 
 bot.on('update', update => {
     const { message } = update;
-    // const { date, text, chat, from } = message;
-    const { chat, from } = message;
+    const { chat, from, date } = message;
     const messageText = message.text;
     if (!messageText) {
         console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
@@ -34,7 +33,8 @@ bot.on('update', update => {
     console.log(`
         Message: ${text}`);
     store.dispatch(updateExpression({ text }));
-    store.dispatch(updateChatSession({ chat }));
+    store.dispatch(updateChatSession({ chat, date }));
+
     // const authorId = from.id;
     return wit.query(text, true).then(result => {
         const outcome = result.outcomes[0]
@@ -46,6 +46,7 @@ bot.on('update', update => {
         if (typeof reply === 'string') {
             console.log('reply', reply);
             return bot.sendMessage({
+                disable_web_page_preview: 'true',
                 chat_id: chat.id,
                 text: reply
             });
@@ -66,6 +67,7 @@ bot.on('update', update => {
                         context.timeFilter.to ? moment(context.timeFilter.to.value) : null
                     );
             bot.sendMessage({
+                disable_web_page_preview: 'true',
                 chat_id: chat.id,
                 text: replyText
             });
