@@ -33,10 +33,11 @@ test.todo('/help command with wit');
 
 test('/restart command', t => {
     const currentState = store.getState();
+    const chatDate = Date.now() / 1000;
     const nextState = {
         ...currentState,
         chats: [
-            { id: 12345, session: {} },
+            { id: 12345, session: {}, date: chatDate * 1000 },
             ...currentState.chats
         ]
     };
@@ -45,7 +46,8 @@ test('/restart command', t => {
             { entities: { command: [{ value: 'restart' }] } },
             {
                 store,
-                chat: { id: 12345 }
+                chat: { id: 12345 },
+                date: chatDate
             }
         ),
         replies.restart
