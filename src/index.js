@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { writeFileSync } from 'fs';
+import { writeFileSync, appendFile } from 'fs';
 import { join as pathJoin } from 'path';
 import bot from './tgBot';
 import wit from './wit';
@@ -12,6 +12,8 @@ import {
     updateOutcome,
     updateChatSession
 } from './actionCreators';
+
+const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 
 const store = createStore();
 
@@ -120,11 +122,17 @@ bot.on('update', update => {
             });
         }
         console.log('what is this?', reply);
+        const debugContext = JSON.stringify(context);
+        const debugOutcome = JSON.stringify(outcome);
+        if (DEBUG_TO_LOGFILE) {
+            const logLine = `${new Date().toString()}, ${text}, ${debugOutcome}, ${debugContext}\n`;
+            appendFile(DEBUG_TO_LOGFILE, logLine, err => console.error(err));
+        }
         return bot.sendMessage({
             chat_id: chat.id,
             text: replies.unknown(
-                `context: ${JSON.stringify(context)}
-                outcome: ${JSON.stringify(outcome)}`
+                `context: ${debugContext}
+                outcome: ${debugOutcome}`
             )
         });
     }).catch(err => console.error(err));

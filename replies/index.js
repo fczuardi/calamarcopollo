@@ -1,6 +1,7 @@
 import { dayString } from '../src/stringHelpers';
 const faqAnswers = require('../answers.json');
 
+const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 const faqReply = value => {
     const selectedAnswer = faqAnswers.find(answer => answer.value === value);
     return selectedAnswer ? selectedAnswer.response : null;
@@ -55,7 +56,7 @@ const replies = {
             `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções ${options ? `:\n\n${options}` : '.'}\n\nPara reservar acesse ${url}`
     },
     // ## Unexpected answer
-    unknown: debug => `Vixe, me confundi. ${debug}`
+    unknown: DEBUG_TO_LOGFILE ? () => 'não entendi 😥' : debug => `Vixe, me confundi. ${debug}`
 };
 /* eslint-enable max-len */
 
