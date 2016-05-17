@@ -3,6 +3,12 @@ import { version } from '../package.json';
 import { replies } from '../replies';
 import router from '../src/router';
 import { createStore } from '../src/store';
+import {
+    startCommand,
+    versionCommand,
+    helpCommand,
+    restartCommand
+} from './helpers/releases/0.3.0';
 
 const store = createStore();
 
@@ -13,7 +19,7 @@ test('/version command', t => {
         replies.version(version)
     );
 });
-test.todo('/version command with wit');
+test('/version command with wit', versionCommand);
 
 test('/start command', t => {
     t.is(
@@ -21,7 +27,7 @@ test('/start command', t => {
         replies.start
     );
 });
-test.todo('/start command with wit');
+test('/start command with wit', startCommand);
 
 test('/help command', t => {
     t.is(
@@ -29,7 +35,7 @@ test('/help command', t => {
         replies.help
     );
 });
-test.todo('/help command with wit');
+test('/help command with wit', helpCommand);
 
 test('/restart command', t => {
     const currentState = store.getState();
@@ -54,7 +60,7 @@ test('/restart command', t => {
     );
     t.deepEqual(store.getState(), nextState);
 });
-test.todo('/restart command with wit');
+test('/restart command with wit', restartCommand);
 
 //
 // -----
