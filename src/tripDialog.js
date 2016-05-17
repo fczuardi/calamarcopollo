@@ -23,7 +23,7 @@ const tripDialogReply = context => {
     const hasTrips = trips !== undefined;
     const hasNoTrips = hasTrips && !trips.length;
     if (hasApiError) {
-        return replies.apiError;
+        return replies.trip.apiError(apiError);
     }
     if (!hasOrigin && !hasDestination) {
         return replies.trip.noPlaces;

@@ -43,7 +43,7 @@ const replies = {
             `Só um minuto, vou buscar aqui… (${origin} 🚌 ${destination}, 🗓 ${day.format('DD/MM/YYYY')} 🕙 ${day.format('HH:mm')}${to ? ` - ${to.format('HH:mm')}` : ''})`,
         noSlug: place =>
         `Infelizmente ${place} é uma localidade que eu não conheço.`,
-        apiError: 'Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte.',
+        apiError: statusCode => `⛔️ Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte. [${statusCode}]`,
         noTrips: (origin, destination) =>
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
         noTripsWithUrl: (origin, destination, url) =>

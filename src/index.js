@@ -116,8 +116,8 @@ bot.on('update', update => {
                     text: secondReply
                 });
             }).catch(err => {
-                console.error(err);
-                const nextContext = Object.assign({}, context, { apiError: true });
+                const { statusCode } = err;
+                const nextContext = Object.assign({}, context, { apiError: statusCode });
                 const errorReply = tripDialogReply(nextContext);
                 return bot.sendMessage({
                     chat_id: chat.id,
