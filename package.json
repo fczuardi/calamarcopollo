@@ -45,7 +45,7 @@
     "babel-plugin-transform-async-to-generator": "^6.8.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "eslint-config-calamar": "^1.0.4"
+    "eslint-config-calamar": "^2.0.0"
   },
   "dependencies": {
     "calamars": "^0.8.11",
