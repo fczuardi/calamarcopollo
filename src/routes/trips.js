@@ -1,12 +1,13 @@
 import { updateChatSession } from '../actionCreators';
 import { tripDialogReply } from '../tripDialog';
 import { WitDriver } from 'calamars';
-const { getEntity, getEntityValue, getEntityMeta } = WitDriver;
+const { getEntity, getEntities, getEntityValue, getEntityMeta } = WitDriver;
 
 const placesConfidenceThreshold = 0.7;
 
 const extractEntities = outcomes => {
     const unknownPlace = getEntity(outcomes, 'places');
+    const unknownPlaces = getEntities(outcomes, 'places');
     const origin = getEntity(outcomes, 'origin');
     const originMeta = getEntityMeta(origin);
     const destination = getEntity(outcomes, 'destination');
@@ -19,6 +20,7 @@ const extractEntities = outcomes => {
     } : null;
     return {
         unknownPlace,
+        unknownPlaces,
         origin,
         originMeta,
         destination,
@@ -35,6 +37,7 @@ const routes = [[
             originMeta,
             destination,
             destinationMeta,
+            unknownPlaces,
             timeFilter
         } = extractEntities(outcomes);
         const context = chat.session;
@@ -48,6 +51,13 @@ const routes = [[
         if (origin && origin.confidence >= placesConfidenceThreshold) {
             nextContext.origin = origin.value;
             nextContext.originMeta = originMeta;
+        }
+        if (!origin && !destination && unknownPlaces.length > 1) {
+            console.log('[issue #25]: 2 places and no role');
+            nextContext.origin = unknownPlaces[0].value;
+            nextContext.originMeta = getEntityMeta(unknownPlaces[0]);
+            nextContext.destination = unknownPlaces[1].value;
+            nextContext.destinationMeta = getEntityMeta(unknownPlaces[1]);
         }
         console.log('nextContext: ', nextContext);
         store.dispatch(updateChatSession({

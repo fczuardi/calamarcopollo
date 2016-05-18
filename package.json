@@ -48,7 +48,7 @@
     "eslint-config-calamar": "^1.0.4"
   },
   "dependencies": {
-    "calamars": "^0.8.8",
+    "calamars": "^0.8.11",
     "fake-clickbus-api": "^0.1.31",
     "latinize": "^0.2.0",
     "moment": "^2.13.0",
