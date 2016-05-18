@@ -1,4 +1,5 @@
 import { WitDriver } from 'calamars';
+const { getEntity, getEntityMeta } = WitDriver;
 import router from '../../../src/router';
 import { replies } from '../../../replies';
 import { version } from '../../../package.json';
@@ -54,7 +55,7 @@ const greeting = async t => {
 const greetingWithUsername = async t => {
     const outcome = await getOutcome('Oi');
     const from = { username: 'George' };
-    t.is(router(outcome, { from: from }), replies.greeting.username(from.username));
+    t.is(router(outcome, { from }), replies.greeting.username(from.username));
 };
 
 const goodbye = async t => {
@@ -66,6 +67,15 @@ const goodbye = async t => {
     t.is(router(outcome3), replies.close);
 };
 
+const tripOriginDestination = async t => {
+    const outcome1 = await getOutcome('horários de São Paulo para Rio de Janeiro');
+    t.is(getEntityMeta(
+        getEntity(outcome1, 'origin')).slugs[0],
+        'sao-paulo-sp-todos');
+    t.is(getEntityMeta(
+        getEntity(outcome1, 'destination')).slugs[0],
+        'rio-de-janeiro-rj-todos');
+};
 export {
     startCommand,
     versionCommand,
@@ -73,5 +83,6 @@ export {
     restartCommand,
     greeting,
     greetingWithUsername,
-    goodbye
+    goodbye,
+    tripOriginDestination
 };
