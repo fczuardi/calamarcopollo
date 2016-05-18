@@ -7,7 +7,10 @@ import {
     startCommand,
     versionCommand,
     helpCommand,
-    restartCommand
+    restartCommand,
+    greeting,
+    greetingWithUsername,
+    goodbye
 } from './helpers/releases/0.3.0';
 
 const store = createStore();
@@ -72,20 +75,20 @@ test('interaction close', t => {
         replies.close
     );
 });
-test.todo('interaction close with wit');
+test('interaction close with wit', goodbye);
 
 test('interaction greeting', t => {
     t.is(router({
         entities: { interaction: [{ value: 'greeting' }] }
     }), replies.greeting.noUsername);
 });
-test.todo('interaction greeting with wit');
+test('interaction greeting with wit', greeting);
 
-test('interaction greeting with username', t => {
+test('interaction greeting + username', t => {
     t.is(router({
         entities: { interaction: [{ value: 'greeting' }] }
     }, {
         from: { username: 'George' }
     }), replies.greeting.username('George'));
 });
-test.todo('interaction greeting and username with wit');
+test('interaction greeting + username with wit', greetingWithUsername);

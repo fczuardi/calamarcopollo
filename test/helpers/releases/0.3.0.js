@@ -18,6 +18,8 @@ const getOutcome = async q => {
     return witResult.outcomes[0];
 };
 
+// # Commands
+
 const startCommand = async t => {
     const outcome = await getOutcome('/start');
     t.is(router(outcome), replies.start);
@@ -38,9 +40,38 @@ const restartCommand = async t => {
     t.is(router(outcome, { store }), replies.restart);
 };
 
+// # Interactions
+
+const greeting = async t => {
+    const outcome1 = await getOutcome('Olá');
+    const outcome2 = await getOutcome('Oi');
+    const outcome3 = await getOutcome('Bom dia bot');
+    t.is(router(outcome1), replies.greeting.noUsername);
+    t.is(router(outcome2), replies.greeting.noUsername);
+    t.is(router(outcome3), replies.greeting.noUsername);
+};
+
+const greetingWithUsername = async t => {
+    const outcome = await getOutcome('Oi');
+    const from = { username: 'George' };
+    t.is(router(outcome, { from: from }), replies.greeting.username(from.username));
+};
+
+const goodbye = async t => {
+    const outcome1 = await getOutcome('Obrigado.');
+    const outcome2 = await getOutcome('Tchau.');
+    const outcome3 = await getOutcome('Valeu bot!');
+    t.is(router(outcome1), replies.close);
+    t.is(router(outcome2), replies.close);
+    t.is(router(outcome3), replies.close);
+};
+
 export {
     startCommand,
     versionCommand,
     helpCommand,
-    restartCommand
+    restartCommand,
+    greeting,
+    greetingWithUsername,
+    goodbye
 };
