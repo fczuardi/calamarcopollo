@@ -22,7 +22,7 @@ test('/version command', t => {
         replies.version(version)
     );
 });
-test('/version command with wit', versionCommand);
+test('[0.3.0] /version command with wit', versionCommand);
 
 test('/start command', t => {
     t.is(
@@ -30,7 +30,7 @@ test('/start command', t => {
         replies.start
     );
 });
-test('/start command with wit', startCommand);
+test('[0.3.0] /start command with wit', startCommand);
 
 test('/help command', t => {
     t.is(
@@ -38,7 +38,7 @@ test('/help command', t => {
         replies.help
     );
 });
-test('/help command with wit', helpCommand);
+test('[0.3.0] /help command with wit', helpCommand);
 
 test('/restart command', t => {
     const currentState = store.getState();
@@ -63,7 +63,7 @@ test('/restart command', t => {
     );
     t.deepEqual(store.getState(), nextState);
 });
-test('/restart command with wit', restartCommand);
+test('[0.3.0] /restart command with wit', restartCommand);
 
 //
 // -----
@@ -75,14 +75,14 @@ test('interaction close', t => {
         replies.close
     );
 });
-test('interaction close with wit', goodbye);
+test('[0.3.0] interaction close with wit', goodbye);
 
 test('interaction greeting', t => {
     t.is(router({
         entities: { interaction: [{ value: 'greeting' }] }
     }), replies.greeting.noUsername);
 });
-test('interaction greeting with wit', greeting);
+test('[0.3.0] interaction greeting with wit', greeting);
 
 test('interaction greeting + username', t => {
     t.is(router({
@@ -91,4 +91,4 @@ test('interaction greeting + username', t => {
         from: { username: 'George' }
     }), replies.greeting.username('George'));
 });
-test('interaction greeting + username with wit', greetingWithUsername);
+test('[0.3.0] interaction greeting + username with wit', greetingWithUsername);

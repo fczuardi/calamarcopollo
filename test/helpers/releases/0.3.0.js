@@ -70,7 +70,7 @@ const goodbye = async t => {
 // # Trips
 
 const tripIntent = async t => {
-    const questions = [
+    const expressions = [
         'Quero viajar.',
         'Passagem',
         'Preciso viajar',
@@ -78,12 +78,35 @@ const tripIntent = async t => {
         'Você sabe horarios de ônibus?',
         'Viagem'
     ];
-    const outcomes = await Promise.all(questions.map(
-            question => getOutcome(question)
+    const outcomes = await Promise.all(expressions.map(
+            expression => getOutcome(expression)
     ));
     return outcomes.map((outcome, i) => t.is(
-        getEntityValue(outcome, 'trip'), 'info', `Expression: ${questions[i]}`
+        getEntityValue(outcome, 'trip'), 'info', `Expression: ${expressions[i]}`
     ));
+};
+
+const tripIntentDestination = async t => {
+    const expressions = [
+        'Quero viajar para santos.',
+        'Passagem pra Atiabia tem?',
+        'Preciso viajar com destino a marília, sp',
+        'Horários de ônibus para ubatuba',
+        'Partiu sampa?',
+        'bora pro rio',
+        'para jahu',
+        'vamos para guarulhos'
+    ];
+    const outcomes = await Promise.all(expressions.map(
+            expression => getOutcome(expression)
+    ));
+    return outcomes.forEach((outcome, i) => {
+        const message = `Expression: ${expressions[i]}`;
+        t.is(getEntityValue(outcome, 'trip'), 'info', message);
+        t.truthy(getEntityValue(outcome, 'destination'), message);
+        t.falsy(getEntityValue(outcome, 'origin'), message);
+        t.falsy(getEntityValue(outcome, 'places'), message);
+    });
 };
 
 const tripOriginDestination = async t => {
@@ -106,5 +129,6 @@ export {
     greetingWithUsername,
     goodbye,
     tripOriginDestination,
-    tripIntent
+    tripIntent,
+    tripIntentDestination
 };
