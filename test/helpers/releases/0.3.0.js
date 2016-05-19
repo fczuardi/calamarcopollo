@@ -71,12 +71,12 @@ const goodbye = async t => {
 
 const tripIntent = async t => {
     const expressions = [
-        'Quero viajar.',
+        'Horários de ônibus',
         'Passagem',
         'Preciso viajar',
-        'Horários de ônibus',
-        'Você sabe horarios de ônibus?',
-        'Viagem'
+        'Quero viajar.',
+        'Viagem',
+        'Você sabe horarios de ônibus?'
     ];
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
@@ -88,13 +88,13 @@ const tripIntent = async t => {
 
 const tripIntentDestination = async t => {
     const expressions = [
-        'Quero viajar para santos.',
+        'bora pro rio',
+        'Horários de ônibus para ubatuba',
+        'para jahu',
+        'Partiu sampa?',
         'Passagem pra Atiabia tem?',
         'Preciso viajar com destino a marília, sp',
-        'Horários de ônibus para ubatuba',
-        'Partiu sampa?',
-        'bora pro rio',
-        'para jahu',
+        'Quero viajar para santos.',
         'vamos para guarulhos'
     ];
     const outcomes = await Promise.all(expressions.map(
