@@ -123,6 +123,7 @@ const tripIntentOrigin = async t => {
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));
+    // console.log(JSON.stringify(outcomes[0]));
     return outcomes.forEach((outcome, i) => {
         const message = `Expression: ${expressions[i]}`;
         t.is(getEntityValue(outcome, 'trip'), 'info', message);
@@ -142,6 +143,37 @@ const tripOriginDestination = async t => {
         'rio-de-janeiro-rj-todos');
 };
 
+const routerPlaceWithNoRoleNoTripInfo = async t => {
+    const outcome = { entities: {
+        places: [{ value: 'Sertãozinho' }]
+    } };
+    t.is(router(outcome), replies.trip.noOrigin);
+};
+
+const routerTripInfoPlaceWithNoRole = async t => {
+    const outcome = { entities: {
+        trip: [{ value: 'info' }],
+        places: [{ value: 'Bauru' }]
+    } };
+    t.is(router(outcome), replies.trip.noOrigin);
+};
+
+const routerTripInfo2PlacesWithNoRole = async t => {
+    const outcome = { entities: {
+        trip: [{ value: 'info' }],
+        places: [
+            {
+                value: 'Sampa',
+                metadata: '{ "slugs": ["sao-paulo-sp-todos"] }'
+            }, {
+                value: 'Rio',
+                metadata: '{ "slugs": ["santos-sp-todos"] }'
+            }
+        ]
+    } };
+    const apiResult = await router(outcome);
+    t.truthy(JSON.parse(apiResult).items.length);
+};
 
 export {
     startCommand,
@@ -154,5 +186,8 @@ export {
     tripIntent,
     tripIntentDestination,
     tripIntentOrigin,
+    routerPlaceWithNoRoleNoTripInfo,
+    routerTripInfoPlaceWithNoRole,
+    routerTripInfo2PlacesWithNoRole,
     tripOriginDestination
 };

@@ -35,8 +35,6 @@ const tripDialogReply = context => {
         return replies.trip.noOrigin;
     }
     if (hasDestination && hasOrigin && !hasTrips) {
-        console.log('originMeta', originMeta);
-        console.log('destinationMeta', destinationMeta);
         if (!originMeta) {
             return replies.trip.noSlug(origin);
         }

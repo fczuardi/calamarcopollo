@@ -10,7 +10,10 @@ import {
     restartCommand,
     greeting,
     greetingWithUsername,
-    goodbye
+    goodbye,
+    routerPlaceWithNoRoleNoTripInfo,
+    routerTripInfoPlaceWithNoRole,
+    routerTripInfo2PlacesWithNoRole
 } from './helpers/releases/0.3.0';
 
 const store = createStore();
@@ -92,3 +95,22 @@ test('interaction greeting + username', t => {
     }), replies.greeting.username('George'));
 });
 test('[0.3.0] interaction greeting + username with wit', greetingWithUsername);
+
+//
+// -----
+//
+// # Trips
+test(
+    '[0.3.0] Expressions without trip info intent and PLACES with no role',
+    routerPlaceWithNoRoleNoTripInfo
+);
+
+test(
+    '[0.3.0] Expressions with TRIP INFO intent and PLACES with no role',
+    routerTripInfoPlaceWithNoRole
+);
+
+test(
+    '[0.3.0] Expressions with TRIP INFO intent and PLACES with no role',
+    routerTripInfo2PlacesWithNoRole
+);
