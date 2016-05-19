@@ -1,5 +1,6 @@
 import { WitDriver } from 'calamars';
-const { getEntity, getEntities, getEntityValue, getEntityMeta } = WitDriver;
+import { polloSanitize } from '../../../src/stringHelpers';
+const { getEntities, getEntityValue } = WitDriver;
 import router from '../../../src/router';
 import { replies } from '../../../replies';
 import { version } from '../../../package.json';
@@ -15,7 +16,7 @@ const wit = new WitDriver(options);
 const store = createStore();
 
 const getOutcome = async q => {
-    const witResult = await wit.query(q);
+    const witResult = await wit.query(polloSanitize(q));
     return witResult.outcomes[0];
 };
 

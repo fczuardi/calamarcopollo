@@ -2,7 +2,7 @@ import moment from 'moment';
 import request from 'request-promise';
 import { writeFileSync, appendFile } from 'fs';
 import { join as pathJoin } from 'path';
-import latinize from 'latinize';
+import { polloSanitize } from './stringHelpers';
 import bot from './tgBot';
 import wit from './wit';
 import router from './router';
@@ -33,9 +33,7 @@ bot.on('update', update => {
         return null;
     }
 
-    const text = latinize(
-        messageText.replace(/^@[^ ]* /, '') // remove botusername
-    ).toLowerCase();
+    const text = polloSanitize(messageText);
     console.log(`
         Message: ${messageText}
                  ${text}`);

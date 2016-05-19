@@ -1,4 +1,5 @@
 import moment from 'moment';
+import latinize from 'latinize';
 
 const dayString = (d, dayStrings) => {
     const day = moment(d);
@@ -20,4 +21,12 @@ const dayString = (d, dayStrings) => {
     return day.format('LL');
 };
 
-export { dayString };
+const polloSanitize = text => latinize(text)
+    .toLowerCase()
+    // remove botusername
+    .replace(/^@[^ ]* /, '')
+    // @HACK wit has trouble with janeiro
+    .replace(/rio de janeiro/, 'riodejaneiro')
+;
+
+export { dayString, polloSanitize };
