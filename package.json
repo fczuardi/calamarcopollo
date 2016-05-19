@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "babel-node src/index.js",
-    "test": "ava",
+    "test": "ava --require babel-register",
     "test:watch": "ava --verbose --watch --require babel-register",
     "test:watch:nockoff": "NOCK_OFF=true npm run test:watch",
     "ppp": "npm version patch && git push && npm publish",
