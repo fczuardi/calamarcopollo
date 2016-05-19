@@ -13,7 +13,6 @@ const extractEntities = outcomes => {
     const destination = getEntity(outcomes, 'destination');
     const destinationMeta = getEntityMeta(destination);
     const dateTime = getEntity(outcomes, 'datetime');
-    console.log('dateTime', dateTime);
     const timeFilter = dateTime ? {
         from: !dateTime.from ? dateTime : dateTime.from,
         to: dateTime.to ? dateTime.to : null
@@ -31,7 +30,7 @@ const extractEntities = outcomes => {
 
 const routes = [[
     outcomes => getEntityValue(outcomes, 'trip') === 'info',
-    (outcomes, { store, chat }) => {
+    (outcomes, { store, chat } = {}) => {
         const {
             origin,
             originMeta,
@@ -40,10 +39,9 @@ const routes = [[
             unknownPlaces,
             timeFilter
         } = extractEntities(outcomes);
-        const context = chat.session;
+        const context = chat && chat.session ? chat.session : {};
         let nextContext = Object.assign({}, context);
         nextContext.timeFilter = timeFilter;
-        console.log('tripInfo intent', context);
         if (destination && destination.confidence >= placesConfidenceThreshold) {
             nextContext.destination = destination.value;
             nextContext.destinationMeta = destinationMeta;
@@ -59,18 +57,22 @@ const routes = [[
             nextContext.destination = unknownPlaces[1].value;
             nextContext.destinationMeta = getEntityMeta(unknownPlaces[1]);
         }
-        if (unknownPlaces && nextContext.origin && !nextContext.destination) {
-            nextContext.destination = unknownPlaces[0].value;
-            nextContext.destinationMeta = getEntityMeta(unknownPlaces[0]);
-        }
         if (unknownPlaces && nextContext.destination && !nextContext.origin) {
             nextContext.origin = unknownPlaces[0].value;
             nextContext.originMeta = getEntityMeta(unknownPlaces[0]);
         }
-        console.log('nextContext: ', nextContext);
-        store.dispatch(updateChatSession({
-            chat: { ...chat, session: nextContext }
-        }));
+        if (
+            (unknownPlaces && nextContext.origin && !nextContext.destination)
+            || (unknownPlaces && !nextContext.origin && !nextContext.destination)
+        ) {
+            nextContext.destination = unknownPlaces[0].value;
+            nextContext.destinationMeta = getEntityMeta(unknownPlaces[0]);
+        }
+        if (store) {
+            store.dispatch(updateChatSession({
+                chat: { ...chat, session: nextContext }
+            }));
+        }
         return tripDialogReply(nextContext);
     }
 ], [
@@ -79,8 +81,8 @@ const routes = [[
         getEntityValue(outcomes, 'origin') ||
         getEntityValue(outcomes, 'destination'
     ))),
-    (outcomes, { store, chat }) => {
-        const context = chat.session;
+    (outcomes, { store, chat } = {}) => {
+        const context = chat && chat.session ? chat.session : {};
         const {
             unknownPlace,
             origin,
@@ -117,10 +119,11 @@ const routes = [[
                 nextContext.destinationMeta = placeMeta;
             }
         }
-        console.log('nextContext: ', nextContext);
-        store.dispatch(updateChatSession({
-            chat: { ...chat, session: nextContext }
-        }));
+        if (store) {
+            store.dispatch(updateChatSession({
+                chat: { ...chat, session: nextContext }
+            }));
+        }
         return tripDialogReply(nextContext);
     }
 ]];
