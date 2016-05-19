@@ -1,6 +1,6 @@
 import { WitDriver } from 'calamars';
 import { polloSanitize } from '../../../src/stringHelpers';
-const { getEntities, getEntityValue } = WitDriver;
+const { getEntity, getEntities, getEntityValue } = WitDriver;
 import router from '../../../src/router';
 import { replies } from '../../../replies';
 import { version } from '../../../package.json';
@@ -159,6 +159,38 @@ const tripOriginDestination = async t => {
     });
 };
 
+const tripOriginDestinationDepartureTime = async t => {
+    const expressions = [
+        'quero ir de ribeirao preto para o rio de janeiro em janeiro',
+        'quero ir de são paulo à santos, sp depois de amanhã as 10 da noite',
+        'quero ir de são paulo à santos, sp depois de amanhã as 10',
+        'quero ir de são paulo à santos, sp depois de amanhã',
+        // 'rio de janeiro até são paulo dia 25 de maio depois das 18', // failing
+        'sampa santos amanhã',
+        'sanca > santos dia 25 de maio',
+        'veja pra mim por favor os horarios de sao carlos para campinas na noite de natal'
+    ];
+    const outcomes = await Promise.all(expressions.map(
+            expression => getOutcome(expression)
+    ));
+    return outcomes.forEach((outcome, i) => {
+        const message = `Expression: ${expressions[i]}`;
+        const origins = getEntities(outcome, 'origin');
+        const destination = getEntityValue(outcome, 'destination');
+        const place = getEntityValue(outcome, 'places');
+        const dateTime = getEntity(outcome, 'datetime');
+        const timeFilter = dateTime ? {
+            from: !dateTime.from ? dateTime : dateTime.from,
+            to: dateTime.to ? dateTime.to : null
+        } : null;
+        t.is(getEntityValue(outcome, 'trip'), 'info', message);
+        t.truthy(timeFilter, `timeFilter ${message}`);
+        t.truthy(origins[0], `origin ${message}`);
+        t.truthy(destination || place || origins[1]
+        , `destination ${message}`);
+    });
+};
+
 const routerPlaceWithNoRoleNoTripInfo = async t => {
     const outcome = { entities: {
         places: [{ value: 'Sertãozinho' }]
@@ -204,5 +236,6 @@ export {
     routerPlaceWithNoRoleNoTripInfo,
     routerTripInfoPlaceWithNoRole,
     routerTripInfo2PlacesWithNoRole,
-    tripOriginDestination
+    tripOriginDestination,
+    tripOriginDestinationDepartureTime
 };
