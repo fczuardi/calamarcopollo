@@ -9,6 +9,7 @@ const extractEntities = outcomes => {
     const unknownPlace = getEntity(outcomes, 'places');
     const unknownPlaces = getEntities(outcomes, 'places');
     const origin = getEntity(outcomes, 'origin');
+    const origins = getEntities(outcomes, 'origin');
     const originMeta = getEntityMeta(origin);
     const destination = getEntity(outcomes, 'destination');
     const destinationMeta = getEntityMeta(destination);
@@ -21,6 +22,7 @@ const extractEntities = outcomes => {
         unknownPlace,
         unknownPlaces,
         origin,
+        origins,
         originMeta,
         destination,
         destinationMeta,
@@ -33,6 +35,7 @@ const routes = [[
     (outcomes, { store, chat } = {}) => {
         const {
             origin,
+            origins,
             originMeta,
             destination,
             destinationMeta,
@@ -49,6 +52,14 @@ const routes = [[
         if (origin && origin.confidence >= placesConfidenceThreshold) {
             nextContext.origin = origin.value;
             nextContext.originMeta = originMeta;
+            if (
+                !destination &&
+                origins.length > 1 &&
+                origins[1].confidence >= placesConfidenceThreshold
+            ) {
+                nextContext.destination = origins[1].value;
+                nextContext.destinationMeta = getEntityMeta(origins[1]);
+            }
         }
         if (!origin && !destination && unknownPlaces.length > 1) {
             console.log('[issue #25]: 2 places and no role');
