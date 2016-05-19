@@ -9,4 +9,8 @@ import {
 test('[0.3.0] Expressions with a TRIP INFO intent but no other data', tripIntent);
 test('[0.3.0] Expressions with TRIP INFO intent and DESTINATION only', tripIntentDestination);
 test('[0.3.0] Expressions with TRIP INFO intent and ORIGIN only', tripIntentOrigin);
-test('[0.3.0] The expression suggested on the help command should work', tripOriginDestination);
+test(
+    '[0.3.0] Expressions with TRIP INFO intent, ORIGIN and DESTINATION',
+    tripOriginDestination
+);
+test.todo('Cities not on Clickbus API: "bora p/ cravinhos, saindo de joanópolis?"');

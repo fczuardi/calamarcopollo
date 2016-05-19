@@ -123,7 +123,6 @@ const tripIntentOrigin = async t => {
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));
-    // console.log(JSON.stringify(outcomes[0]));
     return outcomes.forEach((outcome, i) => {
         const message = `Expression: ${expressions[i]}`;
         t.is(getEntityValue(outcome, 'trip'), 'info', message);
@@ -134,13 +133,28 @@ const tripIntentOrigin = async t => {
 };
 
 const tripOriginDestination = async t => {
-    const outcome1 = await getOutcome('horários de São Paulo para Rio de Janeiro');
-    t.is(getEntityMeta(
-        getEntity(outcome1, 'origin')).slugs[0],
-        'sao-paulo-sp-todos');
-    t.is(getEntityMeta(
-        getEntity(outcome1, 'destination')).slugs[0],
-        'rio-de-janeiro-rj-todos');
+    const expressions = [
+        'bora para santos saindo de são paulo?',
+        // 'from campinas to rio de janeiro', //failing
+        // 'from campinas to rio de janeiro, rj', //failing
+        'horários de São Paulo para Rio de Janeiro',
+        'passagem de Santos, SP para Rio de Janeiro, RJ',
+        'quais opções tenho eu para ir de brasilha à guarulos?',
+        'quero ribeirao, sanca',
+        'sampa > santos'
+    ];
+    const outcomes = await Promise.all(expressions.map(
+            expression => getOutcome(expression)
+    ));
+    return outcomes.forEach((outcome, i) => {
+        // console.log('outcome', outcome);
+        const message = `Expression: ${expressions[i]}`;
+        t.is(getEntityValue(outcome, 'trip'), 'info', message);
+        t.truthy(getEntityValue(outcome, 'origin'), message);
+        t.truthy(getEntityValue(outcome, 'destination'), message);
+        t.truthy(getEntityMeta(getEntity(outcome, 'origin')), message);
+        t.truthy(getEntityMeta(getEntity(outcome, 'destination')), message);
+    });
 };
 
 const routerPlaceWithNoRoleNoTripInfo = async t => {
