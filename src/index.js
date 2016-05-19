@@ -1,4 +1,5 @@
 import moment from 'moment';
+import request from 'request-promise';
 import { writeFileSync, appendFile } from 'fs';
 import { join as pathJoin } from 'path';
 import latinize from 'latinize';
@@ -43,11 +44,12 @@ bot.on('update', update => {
 
     // const authorId = from.id;
     return wit.query(text, true).then(result => {
+        /* eslint-disable no-underscore-dangle */
         const outcome = result.outcomes[0]
             ? { text: result._text, entities: result.outcomes[0].entities }
             : {};
+        /* eslint-enable no-underscore-dangle */
         const reply = router(outcome, { store, chat, from, date });
-        console.log(JSON.stringify(outcome));
         store.dispatch(updateOutcome(outcome));
         if (typeof reply === 'string') {
             console.log('reply', reply);
@@ -59,8 +61,7 @@ bot.on('update', update => {
         }
         const currentChat = store.getState().chats.find(item => item.id === chat.id);
         const context = currentChat.session;
-        if (reply && typeof reply.then === 'function') {
-            console.log('reply is a promise, context is:', JSON.stringify(context));
+        if (reply && reply.url) {
             const replyText = !context.timeFilter
                 ? replies.trip.requesting(context.origin, context.destination)
                 : context.timeFilter.from.grain === 'day'
@@ -77,7 +78,8 @@ bot.on('update', update => {
                 chat_id: chat.id,
                 text: replyText
             });
-            return reply.then(body => {
+            console.log(`requesting ${reply.url}`);
+            return request(reply.url).then(body => {
                 console.log('reply arrived');
                 const apiResult = JSON.parse(body);
                 const rawTrips = apiResult.items;

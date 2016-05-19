@@ -1,5 +1,4 @@
 import moment from 'moment';
-import request from 'request-promise';
 import { replies } from '../replies';
 
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
@@ -47,8 +46,9 @@ const tripDialogReply = context => {
             ? moment(timeFilter.from.value) : moment();
         const departure = day.format('YYYY-MM-DD');
         const url = `${CLICKBUS_URL}/trips?from=${from}&to=${to}&departure=${departure}`;
-        console.log(`requesting ${url}`);
-        return request(url);
+        return {
+            url
+        };
     }
     if (!originMeta || !destinationMeta) {
         return replies.trip.noTrips(origin, destination);

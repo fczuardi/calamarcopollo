@@ -171,8 +171,7 @@ const routerTripInfo2PlacesWithNoRole = async t => {
             }
         ]
     } };
-    const apiResult = await router(outcome);
-    t.truthy(JSON.parse(apiResult).items.length);
+    t.truthy(router(outcome).url);
 };
 
 export {
