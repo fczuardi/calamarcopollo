@@ -39,6 +39,7 @@ const routes = [[
             originMeta,
             destination,
             destinationMeta,
+            unknownPlace,
             unknownPlaces,
             timeFilter
         } = extractEntities(outcomes);
@@ -52,13 +53,17 @@ const routes = [[
         if (origin && origin.confidence >= placesConfidenceThreshold) {
             nextContext.origin = origin.value;
             nextContext.originMeta = originMeta;
-            if (
-                !destination &&
-                origins.length > 1 &&
-                origins[1].confidence >= placesConfidenceThreshold
-            ) {
-                nextContext.destination = origins[1].value;
-                nextContext.destinationMeta = getEntityMeta(origins[1]);
+            if (!destination) {
+                if (
+                    origins.length > 1 &&
+                    origins[1].confidence >= placesConfidenceThreshold
+                ) {
+                    nextContext.destination = origins[1].value;
+                    nextContext.destinationMeta = getEntityMeta(origins[1]);
+                } else if (unknownPlace) {
+                    nextContext.destination = unknownPlace.value;
+                    nextContext.destinationMeta = getEntityMeta(unknownPlace);
+                }
             }
         }
         if (!origin && !destination && unknownPlaces.length > 1) {

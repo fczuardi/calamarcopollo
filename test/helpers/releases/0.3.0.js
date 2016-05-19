@@ -1,5 +1,5 @@
 import { WitDriver } from 'calamars';
-const { getEntity, getEntityValue, getEntityMeta } = WitDriver;
+const { getEntity, getEntities, getEntityValue, getEntityMeta } = WitDriver;
 import router from '../../../src/router';
 import { replies } from '../../../replies';
 import { version } from '../../../package.json';
@@ -135,8 +135,8 @@ const tripIntentOrigin = async t => {
 const tripOriginDestination = async t => {
     const expressions = [
         'bora para santos saindo de são paulo?',
-        // 'from campinas to rio de janeiro', //failing
-        // 'from campinas to rio de janeiro, rj', //failing
+        'from campinas to rio de janeiro',
+        'from campinas to rio de janeiro, rj',
         'horários de São Paulo para Rio de Janeiro',
         'passagem de Santos, SP para Rio de Janeiro, RJ',
         'quais opções tenho eu para ir de brasilha à guarulos?',
@@ -147,13 +147,14 @@ const tripOriginDestination = async t => {
             expression => getOutcome(expression)
     ));
     return outcomes.forEach((outcome, i) => {
-        // console.log('outcome', outcome);
         const message = `Expression: ${expressions[i]}`;
+        const origins = getEntities(outcome, 'origin');
+        const destination = getEntityValue(outcome, 'destination');
+        const place = getEntityValue(outcome, 'places');
         t.is(getEntityValue(outcome, 'trip'), 'info', message);
-        t.truthy(getEntityValue(outcome, 'origin'), message);
-        t.truthy(getEntityValue(outcome, 'destination'), message);
-        t.truthy(getEntityMeta(getEntity(outcome, 'origin')), message);
-        t.truthy(getEntityMeta(getEntity(outcome, 'destination')), message);
+        t.truthy(origins[0], message);
+        t.truthy(destination || place || origins[1]
+        , message);
     });
 };
 
