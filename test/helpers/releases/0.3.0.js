@@ -109,6 +109,29 @@ const tripIntentDestination = async t => {
     });
 };
 
+const tripIntentOrigin = async t => {
+    const expressions = [
+        'de osasco',
+        'Estou em Itatiba, quero uma passagem',
+        'Horários de ônibus a partir de são carlos',
+        'Origem sampa',
+        'partindo de ribeirao preto, o que tem?',
+        'passagens do rio',
+        'Preciso viajar saindo de rio de janeiro, rj',
+        'Quero viajar saindo de santos.'
+    ];
+    const outcomes = await Promise.all(expressions.map(
+            expression => getOutcome(expression)
+    ));
+    return outcomes.forEach((outcome, i) => {
+        const message = `Expression: ${expressions[i]}`;
+        t.is(getEntityValue(outcome, 'trip'), 'info', message);
+        t.truthy(getEntityValue(outcome, 'origin'), message);
+        t.falsy(getEntityValue(outcome, 'destination'), message);
+        t.falsy(getEntityValue(outcome, 'places'), message);
+    });
+};
+
 const tripOriginDestination = async t => {
     const outcome1 = await getOutcome('horários de São Paulo para Rio de Janeiro');
     t.is(getEntityMeta(
@@ -128,7 +151,8 @@ export {
     greeting,
     greetingWithUsername,
     goodbye,
-    tripOriginDestination,
     tripIntent,
-    tripIntentDestination
+    tripIntentDestination,
+    tripIntentOrigin,
+    tripOriginDestination
 };
