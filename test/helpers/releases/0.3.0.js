@@ -1,5 +1,5 @@
 import { WitDriver } from 'calamars';
-const { getEntity, getEntityMeta } = WitDriver;
+const { getEntity, getEntityValue, getEntityMeta } = WitDriver;
 import router from '../../../src/router';
 import { replies } from '../../../replies';
 import { version } from '../../../package.json';
@@ -67,6 +67,25 @@ const goodbye = async t => {
     t.is(router(outcome3), replies.close);
 };
 
+// # Trips
+
+const tripIntent = async t => {
+    const questions = [
+        'Quero viajar.',
+        'Passagem',
+        'Preciso viajar',
+        'Horários de ônibus',
+        'Você sabe horarios de ônibus?',
+        'Viagem'
+    ];
+    const outcomes = await Promise.all(questions.map(
+            question => getOutcome(question)
+    ));
+    return outcomes.map((outcome, i) => t.is(
+        getEntityValue(outcome, 'trip'), 'info', `Expression: ${questions[i]}`
+    ));
+};
+
 const tripOriginDestination = async t => {
     const outcome1 = await getOutcome('horários de São Paulo para Rio de Janeiro');
     t.is(getEntityMeta(
@@ -76,6 +95,8 @@ const tripOriginDestination = async t => {
         getEntity(outcome1, 'destination')).slugs[0],
         'rio-de-janeiro-rj-todos');
 };
+
+
 export {
     startCommand,
     versionCommand,
@@ -84,5 +105,6 @@ export {
     greeting,
     greetingWithUsername,
     goodbye,
-    tripOriginDestination
+    tripOriginDestination,
+    tripIntent
 };
