@@ -3,6 +3,7 @@ import { replies } from '../replies';
 
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
 const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
+const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
 
 const tripListSizeThreshold = 10;
 
@@ -55,7 +56,7 @@ const tripDialogReply = context => {
     }
     const from = originMeta.slugs[0];
     const to = destinationMeta.slugs[0];
-    const webUrl = `${CLICKBUS_WEB_URL}/${from}/${to}/`;
+    const webUrl = `${CLICKBUS_WEB_URL}/${from}/${to}/?${CLICKBUS_UTM_PARAMS}`;
     if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
         return replies.trip.noTripsWithUrl(origin, destination, webUrl);
     }
