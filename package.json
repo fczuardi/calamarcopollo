@@ -20,7 +20,7 @@
     "cp:npm": "cp README.md package.json LICENSE dist/npm/. && cp answers-sample.json dist/npm/answers.json",
     "build:npm": "babel -d dist/npm/src -D src && babel -d dist/npm/replies -D replies",
     "postbuild:npm": "npm run cp:npm",
-    "prepublish:npm": "build:npm",
+    "prepublish:npm": "npm run build:npm",
     "publish:npm": "npm publish dist/npm",
     "ppp": "npm version patch && git push && npm run publish:npm && git push calamar master",
     "mpp": "npm version minor && git push && npm run publish:npm && git push calamar master"
