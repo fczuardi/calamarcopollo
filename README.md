@@ -21,14 +21,12 @@ For inspiration of what the pollo is capable of, try one of the [sample statemen
 ## Install
 
 ```sh
-git clone https://github.com/calamar-io/calamarcopollo.git
-cd calamarcopollo
-npm install --production
-npm run build:npm
-cp .env-sample .env
-nano .env
+mkdir mybot
+cd mybot
+npm install calamarcopollo@latest
+cp node_modules/calamarcopollo/.env-sample .env
 # fill-in the blanks
-npm start
+`npm bin`/pollo
 ```
 
 ## License AGPL v3.0
