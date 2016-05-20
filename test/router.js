@@ -14,7 +14,7 @@ import {
     routerPlaceWithNoRoleNoTripInfo,
     routerTripInfoPlaceWithNoRole,
     routerTripInfo2PlacesWithNoRole
-} from './helpers/releases/0.3.0';
+} from './helpers/releases/v0.3.0';
 
 const store = createStore();
 

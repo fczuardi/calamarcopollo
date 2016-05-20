@@ -1,11 +1,11 @@
 import { WitDriver } from 'calamars';
-import { polloSanitize } from '../../../src/stringHelpers';
+import { polloSanitize } from '../../../../src/stringHelpers';
 const { getEntity, getEntities, getEntityValue } = WitDriver;
-import router from '../../../src/router';
-import { replies } from '../../../replies';
-import { version } from '../../../package.json';
-import { createStore } from '../../../src/store';
-
+import router from '../../../../src/router';
+import { replies } from '../../../../replies';
+import { version } from '../../../../package.json';
+import { createStore } from '../../../../src/store';
+import { cmd, interaction, trips } from './statements';
 
 const options = {
     id: process.env.WIT_APP_ID,
@@ -23,62 +23,71 @@ const getOutcome = async q => {
 // # Commands
 
 const startCommand = async t => {
-    const outcome = await getOutcome('/start');
-    t.is(router(outcome), replies.start);
+    const expressions = cmd.start;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.start, `Expression: ${expressions[i]}`
+    ));
 };
 
 const versionCommand = async t => {
-    const outcome = await getOutcome('/version');
-    t.is(router(outcome), replies.version(version));
+    const expressions = cmd.version;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.version(version), `Expression: ${expressions[i]}`
+    ));
 };
 
 const helpCommand = async t => {
-    const outcome = await getOutcome('/help');
-    t.is(router(outcome), replies.help);
+    const expressions = cmd.help;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.help, `Expression: ${expressions[i]}`
+    ));
 };
 
 const restartCommand = async t => {
-    const outcome = await getOutcome('/restart');
-    t.is(router(outcome, { store }), replies.restart);
+    const expressions = cmd.restart;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome, { store }), replies.restart, `Expression: ${expressions[i]}`
+    ));
 };
 
 // # Interactions
 
 const greeting = async t => {
-    const outcome1 = await getOutcome('Olá');
-    const outcome2 = await getOutcome('Oi');
-    const outcome3 = await getOutcome('Bom dia bot');
-    t.is(router(outcome1), replies.greeting.noUsername);
-    t.is(router(outcome2), replies.greeting.noUsername);
-    t.is(router(outcome3), replies.greeting.noUsername);
+    const expressions = interaction.greeting;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.greeting.noUsername,
+        `Expression: ${expressions[i]}`
+    ));
 };
 
 const greetingWithUsername = async t => {
-    const outcome = await getOutcome('Oi');
+    const expressions = interaction.greeting;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     const from = { username: 'George' };
-    t.is(router(outcome, { from }), replies.greeting.username(from.username));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome, { from }), replies.greeting.username(from.username),
+        `Expression: ${expressions[i]}`
+    ));
 };
 
 const goodbye = async t => {
-    const outcome1 = await getOutcome('Obrigado.');
-    const outcome2 = await getOutcome('Tchau.');
-    const outcome3 = await getOutcome('Valeu bot!');
-    t.is(router(outcome1), replies.close);
-    t.is(router(outcome2), replies.close);
-    t.is(router(outcome3), replies.close);
+    const expressions = interaction.close;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.close,
+        `Expression: ${expressions[i]}`
+    ));
 };
 
 // # Trips
 
 const tripIntent = async t => {
-    const expressions = [
-        'Horários de ônibus',
-        'Passagem',
-        'Preciso viajar',
-        'Quero viajar.',
-        'Viagem',
-        'Você sabe horarios de ônibus?'
-    ];
+    const expressions = trips.info;
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));
@@ -88,16 +97,7 @@ const tripIntent = async t => {
 };
 
 const tripIntentDestination = async t => {
-    const expressions = [
-        'bora pro rio',
-        'Horários de ônibus para ubatuba',
-        'para jahu',
-        'Partiu sampa?',
-        'Passagem pra Atiabia tem?',
-        'Preciso viajar com destino a marília, sp',
-        'Quero viajar para santos.',
-        'vamos para guarulhos'
-    ];
+    const expressions = trips.infoDest;
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));
@@ -111,16 +111,7 @@ const tripIntentDestination = async t => {
 };
 
 const tripIntentOrigin = async t => {
-    const expressions = [
-        'de osasco',
-        'Estou em Itatiba, quero uma passagem',
-        'Horários de ônibus a partir de são carlos',
-        'Origem sampa',
-        'partindo de ribeirao preto, o que tem?',
-        'passagens do rio',
-        'Preciso viajar saindo de rio de janeiro, rj',
-        'Quero viajar saindo de santos.'
-    ];
+    const expressions = trips.infoOrigin;
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));
@@ -134,16 +125,7 @@ const tripIntentOrigin = async t => {
 };
 
 const tripOriginDestination = async t => {
-    const expressions = [
-        'bora para santos saindo de são paulo?',
-        'from campinas to rio de janeiro',
-        'from campinas to rio de janeiro, rj',
-        'horários de São Paulo para Rio de Janeiro',
-        'passagem de Santos, SP para Rio de Janeiro, RJ',
-        'quais opções tenho eu para ir de brasilha à guarulos?',
-        'quero ribeirao, sanca',
-        'sampa > santos'
-    ];
+    const expressions = trips.infoOriginDest;
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));
@@ -160,16 +142,7 @@ const tripOriginDestination = async t => {
 };
 
 const tripOriginDestinationDepartureTime = async t => {
-    const expressions = [
-        'quero ir de ribeirao preto para o rio de janeiro em janeiro',
-        'quero ir de são paulo à santos, sp depois de amanhã as 10 da noite',
-        'quero ir de são paulo à santos, sp depois de amanhã as 10',
-        'quero ir de são paulo à santos, sp depois de amanhã',
-        // 'rio de janeiro até são paulo dia 25 de maio depois das 18', // failing
-        'sampa santos amanhã',
-        'sanca > santos dia 25 de maio',
-        'veja pra mim por favor os horarios de sao carlos para campinas na noite de natal'
-    ];
+    const expressions = trips.infoOriginDestTime;
     const outcomes = await Promise.all(expressions.map(
             expression => getOutcome(expression)
     ));

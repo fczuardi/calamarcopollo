@@ -11,6 +11,8 @@
     "test": "ava --require babel-register",
     "test:watch": "ava --verbose --watch --require babel-register",
     "test:watch:nockoff": "NOCK_OFF=true npm run test:watch",
+    "doc": "docco -l linear test/helpers/releases/v0.3.0/statements.js",
+    "publish:doc": "./tasks/insert-version.js && gh-pages -d docs",
     "ppp": "npm version patch && git push && npm publish",
     "mpp": "npm version minor && git push && npm publish"
   },
@@ -45,7 +47,10 @@
     "babel-plugin-transform-async-to-generator": "^6.8.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "eslint-config-calamar": "^2.1.1"
+    "docco": "^0.7.0",
+    "eslint-config-calamar": "^2.1.1",
+    "gh-pages": "^0.11.0",
+    "shelljs": "^0.7.0"
   },
   "dependencies": {
     "calamars": "^0.8.11",
