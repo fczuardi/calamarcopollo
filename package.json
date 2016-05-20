@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=6"
   },
+  "bin" : {
+      "pollo" : "src/index.js"
+  },
   "scripts": {
     "start": "dist/npm/src/index.js",
     "start:dev": "babel-node src/index.js",
