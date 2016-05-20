@@ -55,7 +55,7 @@ const routes = [[
             nextContext.originMeta = originMeta;
             if (!destination) {
                 if (
-                    origins.length > 1 &&
+                    origins && origins.length > 1 &&
                     origins[1].confidence >= placesConfidenceThreshold
                 ) {
                     nextContext.destination = origins[1].value;
@@ -66,7 +66,7 @@ const routes = [[
                 }
             }
         }
-        if (!origin && !destination && unknownPlaces.length > 1) {
+        if (!origin && !destination && unknownPlaces && unknownPlaces.length > 1) {
             console.log('[issue #25]: 2 places and no role');
             nextContext.origin = unknownPlaces[0].value;
             nextContext.originMeta = getEntityMeta(unknownPlaces[0]);
