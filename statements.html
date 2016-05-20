@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Calamarcopollo example Statements</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          
+          <h1 id="calamarcopollo-example-statements">Calamarcopollo example Statements</h1>
+
+          
+        
+
+        
+      </div>
+
+      
+        
+        <h2 id="v0-3-10">v0.3.10</h2>
+
+        
+      
+        
+        <p>Below is a list of sample messages that can be used with this version
+of the bot, this is a non-exaustive list since the bot uses a natural language
+interpreter and can learn to answer to similar phrasings.</p>
+<h3 id="commands">Commands</h3>
+<p>There are some explicit commands that you can pass to the bot by using the
+format <code>/command</code>, you can also call those commands with natural language:</p>
+
+        
+          <div class='highlight'><pre><span class="hljs-keyword">const</span> cmd = {</pre></div>
+        
+      
+        
+        <p>Telegram’s default start command</p>
+
+        
+          <div class='highlight'><pre>    start: [
+        <span class="hljs-string">'/start'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Ask the bot to tell you what version of this codebase it is using</p>
+
+        
+          <div class='highlight'><pre>    version: [
+        <span class="hljs-string">'/version'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Messages to get a usage hint</p>
+
+        
+          <div class='highlight'><pre>    help: [
+        <span class="hljs-string">'/help'</span>,
+        <span class="hljs-string">'ajuda'</span>,
+        <span class="hljs-string">'como usa isso?'</span>,
+        <span class="hljs-string">'o que vc sabe fazer?'</span>,
+        <span class="hljs-string">'como funciona?'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Messages to manually reset the chat session and restart with a blank context</p>
+
+        
+          <div class='highlight'><pre>    restart: [
+        <span class="hljs-string">'/restart'</span>,
+        <span class="hljs-string">'de novo'</span>,
+        <span class="hljs-string">'/reset'</span>,
+        <span class="hljs-string">'esquece tudo'</span>
+    ]
+};</pre></div>
+        
+      
+        
+        <h3 id="interactions">Interactions</h3>
+<p>Statements that are not commands and do not provide any data useful for
+context, just chat.</p>
+
+        
+          <div class='highlight'><pre><span class="hljs-keyword">const</span> interaction = {</pre></div>
+        
+      
+        
+        <p>Conversation starters</p>
+
+        
+          <div class='highlight'><pre>    greeting: [
+        <span class="hljs-string">'Olá'</span>,
+        <span class="hljs-string">'Oi'</span>,
+        <span class="hljs-string">'Bom dia bot'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>End of an interaction</p>
+
+        
+          <div class='highlight'><pre>    close: [
+        <span class="hljs-string">'Obrigado.'</span>,
+        <span class="hljs-string">'Tchau.'</span>,
+        <span class="hljs-string">'Valeu bot!'</span>
+    ]
+};</pre></div>
+        
+      
+        
+        <h3 id="trip-info-intent-and-dialogs">Trip Info intent and dialogs</h3>
+<p>Statements that provides information about what trip the user is looking
+for: such as origin city, destination, departure day and time</p>
+
+        
+          <div class='highlight'><pre><span class="hljs-keyword">const</span> trips = {</pre></div>
+        
+      
+        
+        <p>Statements containing only the trip info intent but no data</p>
+
+        
+          <div class='highlight'><pre>    info: [
+        <span class="hljs-string">'Horários de ônibus'</span>,
+        <span class="hljs-string">'Passagem'</span>,
+        <span class="hljs-string">'Preciso viajar'</span>,
+        <span class="hljs-string">'Quero viajar.'</span>,
+        <span class="hljs-string">'Viagem'</span>,
+        <span class="hljs-string">'Você sabe horarios de ônibus?'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Some ways of informing the destination</p>
+
+        
+          <div class='highlight'><pre>    infoDest: [
+        <span class="hljs-string">'bora pro rio'</span>,
+        <span class="hljs-string">'Horários de ônibus para ubatuba'</span>,
+        <span class="hljs-string">'para jahu'</span>,
+        <span class="hljs-string">'Partiu sampa?'</span>,
+        <span class="hljs-string">'Passagem pra Atiabia tem?'</span>,
+        <span class="hljs-string">'Preciso viajar com destino a marília, sp'</span>,
+        <span class="hljs-string">'Quero viajar para santos.'</span>,
+        <span class="hljs-string">'vamos para guarulhos'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Some example of accepted ways of phrasing the origin city</p>
+
+        
+          <div class='highlight'><pre>    infoOrigin: [
+        <span class="hljs-string">'de osasco'</span>,
+        <span class="hljs-string">'Estou em Itatiba, quero uma passagem'</span>,
+        <span class="hljs-string">'Horários de ônibus a partir de são carlos'</span>,
+        <span class="hljs-string">'Origem sampa'</span>,
+        <span class="hljs-string">'partindo de ribeirao preto, o que tem?'</span>,
+        <span class="hljs-string">'passagens do rio'</span>,
+        <span class="hljs-string">'Preciso viajar saindo de rio de janeiro, rj'</span>,
+        <span class="hljs-string">'Quero viajar saindo de santos.'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Expressions with both origin and destination</p>
+
+        
+          <div class='highlight'><pre>    infoOriginDest: [
+        <span class="hljs-string">'bora para santos saindo de são paulo?'</span>,
+        <span class="hljs-string">'from campinas to rio de janeiro'</span>,
+        <span class="hljs-string">'from campinas to rio de janeiro, rj'</span>,
+        <span class="hljs-string">'horários de São Paulo para Rio de Janeiro'</span>,
+        <span class="hljs-string">'passagem de Santos, SP para Rio de Janeiro, RJ'</span>,
+        <span class="hljs-string">'quais opções tenho eu para ir de brasilha à guarulos?'</span>,
+        <span class="hljs-string">'quero ribeirao, sanca'</span>,
+        <span class="hljs-string">'sampa &gt; santos'</span>
+    ],</pre></div>
+        
+      
+        
+        <p>Expressions with origin, destination and time filter</p>
+
+        
+          <div class='highlight'><pre>    infoOriginDestTime: [
+        <span class="hljs-string">'quero ir de ribeirao preto para o rio de janeiro em janeiro'</span>,
+        <span class="hljs-string">'quero ir de são paulo à santos, sp depois de amanhã as 10 da noite'</span>,
+        <span class="hljs-string">'quero ir de são paulo à santos, sp depois de amanhã as 10'</span>,
+        <span class="hljs-string">'quero ir de são paulo à santos, sp depois de amanhã'</span>,</pre></div>
+        
+      
+        
+        <p>‘rio de janeiro até são paulo dia 25 de maio depois das 18’, // failing</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-string">'sampa santos amanhã'</span>,
+        <span class="hljs-string">'sanca &gt; santos dia 25 de maio'</span>,
+        <span class="hljs-string">'veja pra mim por favor os horarios de sao carlos para campinas na noite de natal'</span>
+    ]
+};
+
+<span class="hljs-keyword">export</span> {
+    cmd,
+    interaction,
+    trips
+};</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>
