@@ -1,13 +1,13 @@
 {
   "name": "calamarcopollo",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Save the chicken foundation",
   "main": "src/index.js",
   "engines": {
     "node": ">=6"
   },
-  "bin" : {
-      "pollo" : "src/index.js"
+  "bin": {
+    "pollo": "src/index.js"
   },
   "scripts": {
     "start": "dist/npm/src/index.js",
