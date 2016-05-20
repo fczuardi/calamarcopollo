@@ -26,6 +26,7 @@ cd mybot
 npm install calamarcopollo@latest
 cp node_modules/calamarcopollo/.env-sample .env
 # fill-in the blanks
+source .env
 `npm bin`/pollo
 ```
 
