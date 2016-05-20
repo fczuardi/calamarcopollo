@@ -2,6 +2,8 @@ import { dayString } from '../src/stringHelpers';
 const faqAnswers = require('../answers.json');
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
+const PRIVACY_POLICY_ON_START = process.env.PRIVACY_POLICY_ON_START === 'yes';
+
 const faqReply = value => {
     const selectedAnswer = faqAnswers.find(answer => answer.value === value);
     return selectedAnswer ? selectedAnswer.response : null;
@@ -18,7 +20,9 @@ const replies = {
     // ## Commands
     version: v => `v${v}`,
     help: 'Tente consultar um horário de ônibus, por exemplo: horários de São Paulo para Rio de Janeiro',
-    start: 'AVISO: Você está conversando com uma versão de desenvolvimento do bot "calamarcopollo" e qualquer frase que você digitar pode ficar publicamente logada na web. Portanto não digite nada privado para este bot. DICA: sempre que quiser recomeçar a interação do zero, digite /restart',
+    start: PRIVACY_POLICY_ON_START
+        ? 'AVISO: Você está conversando com uma versão de desenvolvimento do bot "calamarcopollo" e qualquer frase que você digitar pode ficar publicamente logada na web. Portanto não digite nada privado para este bot. DICA: sempre que quiser recomeçar a interação do zero, digite /restart'
+        : 'Bem vindo, em que posso ajudar?',
     restart: 'OK, vamos recomeçar do zero.',
     // ## Insult
     insult: 'Eu sou um robô e meu trabalho é servir, faço o possível mas nem sempre acerto… pode extravazar seu descontentamento em mim, eu mereço.',
@@ -42,7 +46,7 @@ const replies = {
         requestingWithDayAndTime: (origin, destination, day, to) =>
             `Só um minuto, vou buscar aqui… (${origin} 🚌 ${destination}, 🗓 ${day.format('DD/MM/YYYY')} 🕙 ${day.format('HH:mm')}${to ? ` - ${to.format('HH:mm')}` : ''})`,
         noSlug: place =>
-        `Infelizmente ${place} é uma localidade que eu não conheço.`,
+            `Infelizmente ${place} é uma localidade que eu não conheço.`,
         apiError: statusCode => `⛔️ Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte. [${statusCode}]`,
         noTrips: (origin, destination) =>
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
@@ -56,7 +60,9 @@ const replies = {
             `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções ${options ? `:\n\n${options}` : '.'}\n\nPara reservar acesse ${url}`
     },
     // ## Unexpected answer
-    unknown: DEBUG_TO_LOGFILE ? () => 'não entendi 😥' : debug => `Vixe, me confundi. ${debug}`
+    unknown: DEBUG_TO_LOGFILE
+        ? () => 'não entendi 😥'
+        : debug => `Vixe, me confundi. ${debug}`
 };
 /* eslint-enable max-len */
 
