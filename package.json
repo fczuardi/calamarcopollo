@@ -7,12 +7,16 @@
     "node": ">=6"
   },
   "scripts": {
-    "start": "babel-node src/index.js",
+    "start": "dist/npm/src/index.js",
+    "start:dev": "babel-node src/index.js",
     "test": "ava --require babel-register",
     "test:watch": "ava --verbose --watch --require babel-register",
     "test:watch:nockoff": "NOCK_OFF=true npm run test:watch",
     "doc": "docco -l linear test/helpers/releases/v0.3.0/statements.js",
     "publish:doc": "./tasks/insert-version.js && gh-pages -d docs",
+    "cp:npm": "cp README.md package.json LICENSE dist/npm/. && cp answers-sample.json dist/npm/answers.json",
+    "build:npm": "babel -d dist/npm/src -D src && babel -d dist/npm/replies -D replies",
+    "postbuild:npm": "npm run cp:npm",
     "ppp": "npm version patch && git push && npm publish",
     "mpp": "npm version minor && git push && npm publish"
   },

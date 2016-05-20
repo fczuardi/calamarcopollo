@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import moment from 'moment';
 import request from 'request-promise';
 import { writeFileSync, appendFile } from 'fs';
