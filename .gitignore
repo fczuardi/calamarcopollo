@@ -1,6 +1,7 @@
 node_modules
 .env
 data
+docs
 todo.md
 answers.json
 debug.log
