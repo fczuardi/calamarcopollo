@@ -63,6 +63,8 @@ class FbBot {
 
     sendMessage({ recipientId, text } = null) {
         console.log('FB sendMessage', recipientId, text);
+        const textChunks = text.match(/.{1,320}/g);
+        console.log('textChunks', textChunks[0]);
         const requestOptions = {
             method: 'POST',
             uri: `https://graph.facebook.com/v2.6/me/messages?access_token=${FB_PAGE_ACCESS_TOKEN}`,
@@ -72,7 +74,7 @@ class FbBot {
                     id: recipientId
                 },
                 message: {
-                    text
+                    text: textChunks[0]
                 }
             }
         };
