@@ -45,11 +45,11 @@ test('[0.3.0] /help command with wit', helpCommand);
 
 test('/restart command', t => {
     const currentState = store.getState();
-    const chatDate = Date.now() / 1000;
+    const chatDate = Date.now();
     const nextState = {
         ...currentState,
         chats: [
-            { id: 12345, session: {}, date: chatDate * 1000 },
+            { id: 12345, session: {}, date: chatDate },
             ...currentState.chats
         ]
     };

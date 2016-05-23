@@ -22,7 +22,8 @@ export default function (state, action) {
     const chatIndex = state.chats.findIndex(item => item.id === chatId);
     const oldChat = chatIndex >= 0 ? state.chats[chatIndex] : null;
     const lastDate = oldChat ? oldChat.date : Date.now();
-    const newDate = date ? date * 1000 : Date.now();
+    const dateInput = date || Date.now();
+    const newDate = dateInput.toString().length < 13 ? dateInput * 1000 : dateInput;
     switch (type) {
     case UPDATE_EXPRESSION:
         return {

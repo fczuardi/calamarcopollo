@@ -5,7 +5,8 @@ import request from 'request-promise';
 import { writeFileSync, appendFile } from 'fs';
 import { join as pathJoin } from 'path';
 import { polloSanitize } from './stringHelpers';
-import bot from './tgBot';
+import tgBot from './tgBot';
+import FBBot from './fbBot';
 import wit from './wit';
 import router from './router';
 import { replies } from '../replies';
@@ -19,14 +20,9 @@ import {
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 
+const fbBot = new FBBot();
 const store = createStore();
-
-bot.getMe()
-    .then(data => console.log(data))
-    .catch(err => console.error(err))
-;
-
-bot.on('update', update => {
+const onUpdate = ({ bot, botType }) => update => {
     const { message } = update;
     const { chat, from, date } = message;
     const messageText = message.text;
@@ -36,6 +32,16 @@ bot.on('update', update => {
     }
 
     const text = polloSanitize(messageText);
+    const tgOptions = {
+        disable_web_page_preview: 'true',
+        chat_id: chat.id
+    };
+    const fbObtions = {
+        recipientId: from.id
+    };
+    const sendMessageOptions = botType === 'facebook'
+        ? fbObtions
+        : tgOptions;
     console.log(`
         Message: ${messageText}
                  ${text}`);
@@ -49,22 +55,27 @@ bot.on('update', update => {
             ? { text: result._text, entities: result.outcomes[0].entities }
             : {};
         /* eslint-enable no-underscore-dangle */
+        console.log('outcome', outcome);
+        console.log('chat, from, date', chat, from, date);
         const reply = router(outcome, { store, chat, from, date });
         store.dispatch(updateOutcome(outcome));
+        console.log('1');
         const currentChat = store.getState().chats.find(item => item.id === chat.id);
+        console.log('2');
         const context = currentChat.session;
+        console.log('3');
         if (typeof reply === 'string') {
             console.log('reply', reply);
             console.log('context', context);
             bot.sendMessage({
-                disable_web_page_preview: 'true',
-                chat_id: chat.id,
+                ...sendMessageOptions,
                 text: reply
             });
+            console.log('4', context);
             // @TODO remove unknown place from context if the bot replied
             // with the noSlug answer
             if (!context.destinationMeta || !context.originMeta) {
-                let nextContext = {
+                const nextContext = {
                     ...context,
                     destination: !context.destinationMeta ? undefined : context.destination,
                     origin: !context.originMeta ? undefined : context.origin
@@ -89,8 +100,7 @@ bot.on('update', update => {
                         context.timeFilter.to ? moment(context.timeFilter.to.value) : null
                     );
             bot.sendMessage({
-                disable_web_page_preview: 'true',
-                chat_id: chat.id,
+                ...sendMessageOptions,
                 text: replyText
             });
             console.log(`requesting ${reply.url}`);
@@ -128,8 +138,7 @@ bot.on('update', update => {
                 const nextContext = Object.assign({}, context, { trips });
                 const secondReply = tripDialogReply(nextContext);
                 return bot.sendMessage({
-                    disable_web_page_preview: 'true',
-                    chat_id: chat.id,
+                    ...sendMessageOptions,
                     text: secondReply
                 });
             }).catch(err => {
@@ -137,7 +146,7 @@ bot.on('update', update => {
                 const nextContext = Object.assign({}, context, { apiError: statusCode });
                 const errorReply = tripDialogReply(nextContext);
                 return bot.sendMessage({
-                    chat_id: chat.id,
+                    ...sendMessageOptions,
                     text: errorReply
                 });
             });
@@ -150,14 +159,17 @@ bot.on('update', update => {
             appendFile(DEBUG_TO_LOGFILE, logLine, err => console.error(err));
         }
         return bot.sendMessage({
-            chat_id: chat.id,
+            ...sendMessageOptions,
             text: replies.unknown(
                 `context: ${debugContext}
                 outcome: ${debugOutcome}`
             )
         });
     }).catch(err => console.error(err));
-});
+};
+
+tgBot.on('update', onUpdate({ bot: tgBot, botType: 'telegram' }));
+fbBot.start(onUpdate({ bot: fbBot, botType: 'facebook' }));
 
 // store.subscribe(() => {
 //     console.log(JSON.stringify(store.getState(), ' ', 2));
