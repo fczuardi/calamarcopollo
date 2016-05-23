@@ -51,16 +51,29 @@ bot.on('update', update => {
         /* eslint-enable no-underscore-dangle */
         const reply = router(outcome, { store, chat, from, date });
         store.dispatch(updateOutcome(outcome));
+        const currentChat = store.getState().chats.find(item => item.id === chat.id);
+        const context = currentChat.session;
         if (typeof reply === 'string') {
             console.log('reply', reply);
-            return bot.sendMessage({
+            bot.sendMessage({
                 disable_web_page_preview: 'true',
                 chat_id: chat.id,
                 text: reply
             });
+            // @TODO remove unknown place from context if the bot replied
+            // with the noSlug answer
+            if (context.destinationMeta === null || context.originMeta === null) {
+                let nextContext = {
+                    ...context,
+                    destination: context.destinationMeta === null ? undefined : context.destination,
+                    origin: context.originMeta === null ? undefined : context.origin
+                };
+                store.dispatch(updateChatSession({
+                    chat: { ...chat, session: nextContext }
+                }));
+            }
+            return reply;
         }
-        const currentChat = store.getState().chats.find(item => item.id === chat.id);
-        const context = currentChat.session;
         if (reply && reply.url) {
             const replyText = !context.timeFilter
                 ? replies.trip.requesting(context.origin, context.destination)
