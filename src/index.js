@@ -55,6 +55,7 @@ bot.on('update', update => {
         const context = currentChat.session;
         if (typeof reply === 'string') {
             console.log('reply', reply);
+            console.log('context', context);
             bot.sendMessage({
                 disable_web_page_preview: 'true',
                 chat_id: chat.id,
@@ -62,12 +63,13 @@ bot.on('update', update => {
             });
             // @TODO remove unknown place from context if the bot replied
             // with the noSlug answer
-            if (context.destinationMeta === null || context.originMeta === null) {
+            if (!context.destinationMeta || !context.originMeta) {
                 let nextContext = {
                     ...context,
-                    destination: context.destinationMeta === null ? undefined : context.destination,
-                    origin: context.originMeta === null ? undefined : context.origin
+                    destination: !context.destinationMeta ? undefined : context.destination,
+                    origin: !context.originMeta ? undefined : context.origin
                 };
+                console.log('remove place?', nextContext);
                 store.dispatch(updateChatSession({
                     chat: { ...chat, session: nextContext }
                 }));
