@@ -1,6 +1,6 @@
 {
   "name": "calamarcopollo",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Save the chicken foundation",
   "main": "src/index.js",
   "engines": {
