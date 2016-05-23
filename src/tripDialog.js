@@ -65,6 +65,12 @@ const tripDialogReply = context => {
         const filteredTripsAfter = trips.filter(trip =>
             trip.departureTime.isAfter(timeFilter.from.value)
         );
+
+        const day = timeFilter && timeFilter.from
+            ? moment(timeFilter.from.value) : moment();
+        const departureDay = day.format('YYYY-MM-DD');
+        const url = `${webUrl}&ida=${departureDay}`;
+
         if (timeFilter.to === null) {
             const tripListAfter = filteredTripsAfter.map(trip => {
                 const departure = moment(trip.departureTime).format('DD/MM HH:mm');
@@ -78,7 +84,7 @@ const tripDialogReply = context => {
                 destination,
                 moment(timeFilter.from.value),
                 filteredTripsAfter.length,
-                webUrl,
+                url,
                 (filteredTripsAfter.length < tripListSizeThreshold) ? tripListAfter : null
             );
         }
@@ -98,7 +104,7 @@ const tripDialogReply = context => {
             moment(timeFilter.from.value),
             moment(timeFilter.to.value),
             filteredTripsBetween.length,
-            webUrl,
+            url,
             (filteredTripsBetween.length < tripListSizeThreshold) ? tripListBetween : null
         );
     }
