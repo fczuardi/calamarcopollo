@@ -6,9 +6,9 @@ import tripRoutes from './routes/trips';
 import insultRoutes from './routes/insult';
 
 const routes = [
+    ...faqRoutes,
     ...commandRoutes,
     ...interactionRoutes,
-    ...faqRoutes,
     ...tripRoutes,
     ...insultRoutes
 ];

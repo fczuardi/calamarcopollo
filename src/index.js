@@ -55,7 +55,7 @@ const onUpdate = ({ bot, botType }) => update => {
             ? { text: result._text, entities: result.outcomes[0].entities }
             : {};
         /* eslint-enable no-underscore-dangle */
-        console.log('outcome', outcome);
+        console.log('outcome', JSON.stringify(outcome));
         console.log('chat, from, date', chat, from, date);
         const reply = router(outcome, { store, chat, from, date });
         store.dispatch(updateOutcome(outcome));
