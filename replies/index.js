@@ -1,5 +1,5 @@
 import { dayString } from '../src/stringHelpers';
-const faqAnswers = require('../answers.json');
+const faqAnswers = require(process.env.FAQ_PATH || '../answers.json');
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 const PRIVACY_POLICY_ON_START = process.env.PRIVACY_POLICY_ON_START === 'yes';
