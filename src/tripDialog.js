@@ -2,8 +2,6 @@ import moment from 'moment';
 import { replies } from '../replies';
 
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
-const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
-const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
 
 const tripListSizeThreshold = 10;
 
@@ -15,7 +13,8 @@ const tripDialogReply = context => {
         destinationMeta,
         timeFilter,
         apiError,
-        trips
+        trips,
+        shortUrl
     } = context;
     const hasOrigin = origin !== undefined;
     const hasDestination = destination !== undefined;
@@ -48,18 +47,16 @@ const tripDialogReply = context => {
         const to = destinationMeta.slugs[0];
         const url = `${CLICKBUS_URL}/trips?from=${from}&to=${to}&departure=${departureDay}`;
         return {
-            url
+            url,
+            departureDay
         };
     }
     if (!originMeta || !destinationMeta) {
         return replies.trip.noTrips(origin, destination);
     }
-    const from = originMeta.slugs[0];
-    const to = destinationMeta.slugs[0];
-    const webUrl = `${CLICKBUS_WEB_URL}/${from}/${to}/?${CLICKBUS_UTM_PARAMS}`;
-    const url = `${webUrl}&ida=${departureDay}`;
+
     if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
-        return replies.trip.noTripsWithUrl(origin, destination, url);
+        return replies.trip.noTripsWithUrl(origin, destination, shortUrl);
     }
     if (hasDestination && hasOrigin && hasTrips && timeFilter &&
                 timeFilter.from && timeFilter.from.grain !== 'day') {
@@ -81,7 +78,7 @@ const tripDialogReply = context => {
                 destination,
                 moment(timeFilter.from.value),
                 filteredTripsAfter.length,
-                url,
+                shortUrl,
                 (filteredTripsAfter.length < tripListSizeThreshold) ? tripListAfter : null
             );
         }
@@ -101,7 +98,7 @@ const tripDialogReply = context => {
             moment(timeFilter.from.value),
             moment(timeFilter.to.value),
             filteredTripsBetween.length,
-            url,
+            shortUrl,
             (filteredTripsBetween.length < tripListSizeThreshold) ? tripListBetween : null
         );
     }
@@ -117,7 +114,7 @@ const tripDialogReply = context => {
         destination,
         departureDay,
         trips.length,
-        url,
+        shortUrl,
         trips.length < tripListSizeThreshold ? tripList : null
     );
 };

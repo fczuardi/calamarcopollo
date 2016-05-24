@@ -17,8 +17,12 @@ import {
     updateOutcome,
     updateChatSession
 } from './actionCreators';
+import GoogleURL from 'google-url';
+const googleUrl = new GoogleURL({ key: process.env.GOOGLE_API_KEY });
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
+const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
+const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
 
 const fbBot = new FBBot();
 const store = createStore();
@@ -59,11 +63,8 @@ const onUpdate = ({ bot, botType }) => update => {
         console.log('chat, from, date', chat, from, date);
         const reply = router(outcome, { store, chat, from, date });
         store.dispatch(updateOutcome(outcome));
-        console.log('1');
         const currentChat = store.getState().chats.find(item => item.id === chat.id);
-        console.log('2');
         const context = currentChat.session;
-        console.log('3');
         if (typeof reply === 'string') {
             console.log('reply', reply);
             console.log('context', context);
@@ -71,7 +72,6 @@ const onUpdate = ({ bot, botType }) => update => {
                 ...sendMessageOptions,
                 text: reply
             });
-            console.log('4', context);
             // @TODO remove unknown place from context if the bot replied
             // with the noSlug answer
             if (!context.destinationMeta || !context.originMeta) {
@@ -135,11 +135,21 @@ const onUpdate = ({ bot, botType }) => update => {
                     };
                 });
                 console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
-                const nextContext = Object.assign({}, context, { trips });
-                const secondReply = tripDialogReply(nextContext);
-                return bot.sendMessage({
-                    ...sendMessageOptions,
-                    text: secondReply
+
+                const srcSlug = context.originMeta.slugs[0];
+                const destSlug = context.destinationMeta.slugs[0];
+                const webUrl = `${CLICKBUS_WEB_URL}/${srcSlug}/${destSlug}/?${CLICKBUS_UTM_PARAMS}`;
+                const url = `${webUrl}&ida=${reply.departureDay}`;
+
+                console.log(`shortening the web url ${url}…`);
+                googleUrl.shorten(url, (err, shortUrl) => {
+                    console.log('URL shortened', shortUrl);
+                    const nextContext = Object.assign({}, context, { trips, shortUrl });
+                    const secondReply = tripDialogReply(nextContext);
+                    return bot.sendMessage({
+                        ...sendMessageOptions,
+                        text: secondReply
+                    });
                 });
             }).catch(err => {
                 const { statusCode } = err;
