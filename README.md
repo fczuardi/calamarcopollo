@@ -16,6 +16,13 @@ This project is also a real-world app used to improve and test the, still very a
 
 If you have [Telegram][telegram] installed, add the [@calamarcopollo_demo_bot][demobot] to your contacts and try to talk to it.
 
+If you have Facebook, send a message in the [CalamarcoPollo facebook page][pollopage]
+asking to be added in the testers list, and then use this
+[fb messenger link][fblink], or if you use the mobile Facebook Messenger app,
+scan the image below:
+
+
+
 For inspiration of what the pollo is capable of, try one of the [sample statements][statements].
 
 ## Install
@@ -39,5 +46,7 @@ This software is distributed under the [GNU AFFERO GENERAL PUBLIC LICENSE versio
 [calamars]: https://github.com/calamar-io/calamars
 [telegram]: https://telegram.org/
 [demobot]: https://telegram.me/calamarcopollo_demo_bot
+[pollopage]: https://www.facebook.com/Calamarcopollo-1782353951999287/
+[fblink]: http://m.me/1782353951999287
 [statements]: http://fczuardi.github.io/calamarcopollo/statements.html
 [license]: https://raw.githubusercontent.com/fczuardi/calamarcopollo/master/LICENSE
