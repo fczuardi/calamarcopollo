@@ -7,12 +7,14 @@ const PORT = process.env.PORT || 8081;
 const FB_VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN;
 const FB_PAGE_ACCESS_TOKEN = process.env.FB_PAGE_ACCESS_TOKEN;
 const webhookPath = '/fbwebhook';
+const fbGraphUrl = 'https://graph.facebook.com/v2.6/me/';
 
 const webRouter = updateCallback => router(_ => {
     /* eslint-disable no-param-reassign */
     _.get(webhookPath, (ctx, next) => {
         if (ctx.query['hub.verify_token'] === FB_VERIFY_TOKEN) {
             ctx.body = ctx.query['hub.challenge'];
+            return next;
         }
         ctx.body = 'Error, wrong validation token';
         return next;
@@ -59,6 +61,12 @@ class FbBot {
         this.app.use(webRouter(updateCallback));
         console.log(`Facebook Messenger Webhook listening port ${PORT}`);
         this.app.listen(PORT);
+        const requestOptions = {
+            method: 'POST',
+            uri: `${fbGraphUrl}subscribed_apps?access_token=${FB_PAGE_ACCESS_TOKEN}`
+        };
+        console.log('make a post to subscribed_apps endpoint');
+        return request(requestOptions);
     }
 
     sendMessage({ recipientId, text } = null) {
@@ -67,7 +75,7 @@ class FbBot {
         console.log('textChunks', textChunks[0]);
         const requestOptions = {
             method: 'POST',
-            uri: `https://graph.facebook.com/v2.6/me/messages?access_token=${FB_PAGE_ACCESS_TOKEN}`,
+            uri: `${fbGraphUrl}messages?access_token=${FB_PAGE_ACCESS_TOKEN}`,
             json: true,
             body: {
                 recipient: {
