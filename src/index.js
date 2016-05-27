@@ -22,6 +22,7 @@ const googleUrl = new GoogleURL({ key: process.env.GOOGLE_API_KEY });
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
+const CLICKBUS_WEB_URL_DATE_PARAM = process.env.CLICKBUS_WEB_URL_DATE_PARAM;
 const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
 
 const fbBot = new FBBot();
@@ -139,7 +140,7 @@ const onUpdate = ({ bot, botType }) => update => {
                 const srcSlug = context.originMeta.slugs[0];
                 const destSlug = context.destinationMeta.slugs[0];
                 const webUrl = `${CLICKBUS_WEB_URL}/${srcSlug}/${destSlug}/?${CLICKBUS_UTM_PARAMS}`;
-                const url = `${webUrl}&ida=${reply.departureDay}`;
+                const url = `${webUrl}&${CLICKBUS_WEB_URL_DATE_PARAM}=${reply.departureDay}`;
 
                 console.log(`shortening the web url ${url}…`);
                 googleUrl.shorten(url, (err, shortUrl) => {
