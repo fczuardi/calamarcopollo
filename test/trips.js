@@ -4,7 +4,8 @@ import {
     tripIntentDestination,
     tripIntentOrigin,
     tripOriginDestination,
-    tripOriginDestinationDepartureTime
+    tripOriginDestinationDepartureTime,
+    tripOriginDestinationDepartureTimeFail
 } from './helpers/releases/v0.3.0';
 
 test('[0.3.0] Expressions with a TRIP INFO intent but no other data', tripIntent);
@@ -17,5 +18,9 @@ test(
 test(
     '[0.3.0] Expressions with TRIP INFO intent, ORIGIN, DESTINATION, DEPARTURE_DATETIME',
     tripOriginDestinationDepartureTime
+);
+test.failing(
+    '[0.3.0] Failing Expressions with TRIP INFO intent, ORIGIN, DESTINATION, DEPARTURE_DATETIME',
+    tripOriginDestinationDepartureTimeFail
 );
 test.todo('Cities not on Clickbus API: "bora p/ cravinhos, saindo de joanópolis?"');

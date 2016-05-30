@@ -141,6 +141,29 @@ const tripOriginDestination = async t => {
     });
 };
 
+const tripOriginDestinationDepartureTimeFail = async t => {
+    const expressions = trips.failingInfoOriginDestTime;
+    const outcomes = await Promise.all(expressions.map(
+            expression => getOutcome(expression)
+    ));
+    return outcomes.forEach((outcome, i) => {
+        const message = `Expression: ${expressions[i]}`;
+        const origins = getEntities(outcome, 'origin');
+        const destination = getEntityValue(outcome, 'destination');
+        const place = getEntityValue(outcome, 'places');
+        const dateTime = getEntity(outcome, 'datetime');
+        const timeFilter = dateTime ? {
+            from: !dateTime.from ? dateTime : dateTime.from,
+            to: dateTime.to ? dateTime.to : null
+        } : null;
+        t.is(getEntityValue(outcome, 'trip'), 'info', message);
+        t.truthy(timeFilter, `timeFilter ${message}`);
+        t.truthy(origins[0], `origin ${message}`);
+        t.truthy(destination || place || origins[1]
+        , `destination ${message}`);
+    });
+};
+
 const tripOriginDestinationDepartureTime = async t => {
     const expressions = trips.infoOriginDestTime;
     const outcomes = await Promise.all(expressions.map(
@@ -210,5 +233,6 @@ export {
     routerTripInfoPlaceWithNoRole,
     routerTripInfo2PlacesWithNoRole,
     tripOriginDestination,
-    tripOriginDestinationDepartureTime
+    tripOriginDestinationDepartureTime,
+    tripOriginDestinationDepartureTimeFail
 };

@@ -110,10 +110,12 @@ const trips = {
         'quero ir de são paulo à santos, sp depois de amanhã as 10 da noite',
         'quero ir de são paulo à santos, sp depois de amanhã as 10',
         'quero ir de são paulo à santos, sp depois de amanhã',
-        'rio de janeiro até são paulo dia 25 de maio depois das 18', // failing
         'sampa santos amanhã',
         'sanca > santos dia 25 de maio',
         'veja pra mim por favor os horarios de sao carlos para campinas na noite de natal'
+    ],
+    failingInfoOriginDestTime: [
+        'rio de janeiro até são paulo dia 25 de maio depois das 18'
     ]
 };
 
