@@ -16,7 +16,7 @@ const dayStrings = {
 };
 
 /* eslint-disable max-len */
-const replies = {
+const defaultReplies = {
     // ## Commands
     version: v => `v${v}`,
     help: 'Tente consultar um horário de ônibus, por exemplo: horários de São Paulo para Rio de Janeiro',
@@ -31,7 +31,7 @@ const replies = {
         noUsername: 'Oi, em que posso ajudar?',
         username: username => `Olá ${username}, em que posso ajudar?`
     },
-    close: '👍',
+    close: ':)',
     // ## FAQ
     faq: faqReply,
     // ## Trip
@@ -65,6 +65,10 @@ const replies = {
         : debug => `Vixe, me confundi. ${debug}`
 };
 /* eslint-enable max-len */
+
+const customRepliesPath = process.env.CUSTOM_REPLIES_PATH || './custom';
+const customReplies = require(customRepliesPath);
+const replies = Object.assign({}, defaultReplies, customReplies);
 
 export {
     replies,
