@@ -67,11 +67,18 @@ const tripDialogReply = context => {
 
         if (timeFilter.to === null) {
             const tripListAfter = filteredTripsAfter.map(trip => {
-                const departure = moment(trip.departureTime).format('DD/MM HH:mm');
-                const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
+                const departure = {
+                    time: moment(trip.departureTime).format('DD/MM HH:mm'),
+                    name: trip.departurePlace
+                };
+                const arrival = {
+                    time: moment(trip.arrivalTime).format('DD/MM HH:mm'),
+                    name: trip.arrivalPlace
+                };
                 const company = trip.busCompanyName;
                 const seats = trip.availableSeats;
-                return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`;
+
+                return replies.trip.listItem(company, departure, arrival, seats);
             }).join('\n');
             return replies.trip.filteredDepartureListAfter(
                 origin,
@@ -86,11 +93,17 @@ const tripDialogReply = context => {
             trip.departureTime.isBefore(timeFilter.to.value)
         );
         const tripListBetween = filteredTripsBetween.map(trip => {
-            const departure = moment(trip.departureTime).format('DD/MM HH:mm');
-            const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
+            const departure = {
+                time: moment(trip.departureTime).format('DD/MM HH:mm'),
+                name: trip.departurePlace
+            };
+            const arrival = {
+                time: moment(trip.arrivalTime).format('DD/MM HH:mm'),
+                name: trip.arrivalPlace
+            };
             const company = trip.busCompanyName;
             const seats = trip.availableSeats;
-            return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`;
+            return replies.trip.listItem(company, departure, arrival, seats);
         }).join('\n');
         return replies.trip.filteredDepartureListBetween(
             origin,
@@ -103,11 +116,17 @@ const tripDialogReply = context => {
         );
     }
     const tripList = trips.map(trip => {
-        const departure = moment(trip.departureTime).format('DD/MM HH:mm');
-        const arrival = moment(trip.arrivalTime).format('DD/MM HH:mm');
+        const departure = {
+            time: moment(trip.departureTime).format('DD/MM HH:mm'),
+            name: trip.departurePlace
+        };
+        const arrival = {
+            time: moment(trip.arrivalTime).format('DD/MM HH:mm'),
+            name: trip.arrivalPlace
+        };
         const company = trip.busCompanyName;
         const seats = trip.availableSeats;
-        return `${company}: ${departure} - ${arrival}, ${seats} lugares disponíveis.`;
+        return replies.trip.listItem(company, departure, arrival, seats);
     }).join('\n');
     return replies.trip.departureList(
         origin,

@@ -110,6 +110,7 @@ const onUpdate = ({ bot, botType }) => update => {
                 const apiResult = JSON.parse(body);
                 const rawTrips = apiResult.items;
                 console.log(`${rawTrips.length} trips`);
+                // console.log(JSON.stringify(rawTrips, ' ', 2));
                 const trips = rawTrips.map(trip => {
                     const firstPart = trip.parts[0];
                     const {
@@ -120,7 +121,9 @@ const onUpdate = ({ bot, botType }) => update => {
                     } = firstPart;
                     const beginTime = departure.waypoint.schedule;
                     const endTime = arrival.waypoint.schedule;
+                    const departurePlace = departure.waypoint.place.city;
                     const departureTime = moment(`${beginTime.date} ${beginTime.time}.000-03`);
+                    const arrivalPlace = arrival.waypoint.place.city;
                     const arrivalTime = moment(`${endTime.date} ${endTime.time}.000-03`);
                     const duration = arrivalTime.diff(departureTime, 'minutes');
                     const busCompanyName = busCompany.name;
@@ -128,6 +131,8 @@ const onUpdate = ({ bot, botType }) => update => {
 `${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration}`
                     );
                     return {
+                        departurePlace,
+                        arrivalPlace,
                         departureTime,
                         arrivalTime,
                         duration,
