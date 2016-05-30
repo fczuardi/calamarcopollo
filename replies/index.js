@@ -51,7 +51,7 @@ const defaultReplies = {
         noTrips: (origin, destination) =>
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
         noTripsWithUrl: (origin, destination, url) =>
-            `Meu acesso ainda é limitado e não consegui encontrar viagens de ${origin} para ${destination}, tente aqui: ${url}`,
+            `Para buscar viagens de ${origin} para ${destination}, utilize este link: ${url}`,
         listItem: (company, departure, arrival, seats) =>
             `${company}: ${departure.name} ${departure.time} 🚌 ${arrival.name} ${arrival.time}, ${seats} lugares disponíveis.`,
         filteredDepartureListAfter: (origin, destination, day, optionsSize, url, options) =>
