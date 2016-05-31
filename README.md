@@ -16,12 +16,9 @@ This project is also a real-world app used to improve and test the, still very a
 
 If you have [Telegram][telegram] installed, add the [@calamarcopollo_demo_bot][demobot] to your contacts and try to talk to it.
 
-If you have Facebook, send a message in the [CalamarcoPollo facebook page][pollopage]
-asking to be added in the testers list, and then use this
-[fb messenger link][fblink], or if you use the mobile Facebook Messenger app,
-scan the image below:
+If you have Facebook, use this [fb messenger link][fblink], or if you use the mobile Facebook Messenger app, scan the image below:
 
-
+![messenger_code_1782353951999287 1](https://cloud.githubusercontent.com/assets/7760/15682570/b77b4828-2734-11e6-954e-34c349600c91.png)
 
 For inspiration of what the pollo is capable of, try one of the [sample statements][statements].
 
