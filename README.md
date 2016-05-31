@@ -37,6 +37,21 @@ source .env
 `npm bin`/pollo
 ```
 
+## Custom replies
+
+In the ```.env``` file, you can setup a path with a javascript module to override
+any of the [default reply strings][defaultreplies], this custom path is stored
+in the ```CUSTOM_REPLIES_PATH``` environment var.
+
+You can copy the ```replies/custom.js``` file to use it as basis for your replacements:
+
+```sh
+cp node_modules/calamarcopollo/replies/custom.js ./custom-replies.js
+# edit .env file to add the absolute path to custom-replies.js file as value
+# for the CUSTOM_REPLIES_PATH variable
+source .env
+```
+
 ## License AGPL v3.0
 
 Copyright (c) 2016 Fabricio C Zuardi
@@ -49,4 +64,5 @@ This software is distributed under the [GNU AFFERO GENERAL PUBLIC LICENSE versio
 [pollopage]: https://www.facebook.com/Calamarcopollo-1782353951999287/
 [fblink]: http://m.me/1782353951999287
 [statements]: http://fczuardi.github.io/calamarcopollo/statements.html
+[defaultreplies]: https://github.com/fczuardi/calamarcopollo/blob/master/replies/index.js#L19-L63
 [license]: https://raw.githubusercontent.com/fczuardi/calamarcopollo/master/LICENSE
