@@ -22,8 +22,11 @@ const googleUrl = new GoogleURL({ key: process.env.GOOGLE_API_KEY });
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
+const CLICKBUS_API_KEY = process.env.CLICKBUS_API_KEY;
 const CLICKBUS_WEB_URL_DATE_PARAM = process.env.CLICKBUS_WEB_URL_DATE_PARAM;
 const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
+
+console.log('CLICKBUS_API_KEY', CLICKBUS_API_KEY);
 
 const fbBot = new FBBot();
 const store = createStore();
@@ -105,7 +108,13 @@ const onUpdate = ({ bot, botType }) => update => {
                 text: replyText
             });
             console.log(`requesting ${reply.url}`);
-            return request(reply.url).then(body => {
+            const apiOptions = {
+                uri: reply.url,
+                headers: {
+                    'X-API-KEY': CLICKBUS_API_KEY
+                }
+            };
+            return request(apiOptions).then(body => {
                 console.log('reply arrived');
                 const apiResult = JSON.parse(body);
                 const rawTrips = apiResult.items;
