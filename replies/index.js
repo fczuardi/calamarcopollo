@@ -70,7 +70,18 @@ const defaultReplies = {
 
 const customRepliesPath = process.env.CUSTOM_REPLIES_PATH || './custom';
 const customReplies = require(customRepliesPath);
-const replies = Object.assign({}, defaultReplies, customReplies);
+const replies = {
+    ...defaultReplies,
+    ...customReplies,
+    greeting: {
+        ...defaultReplies.greeting,
+        ...customReplies.greeting
+    },
+    trip: {
+        ...defaultReplies.trip,
+        ...customReplies.trip
+    }
+};
 
 export {
     replies,
