@@ -1,4 +1,4 @@
-import { dayString } from '../src/stringHelpers';
+import { dayString, durationFormat } from '../src/stringHelpers';
 const faqAnswers = require(process.env.FAQ_PATH || '../answers.json');
 
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
@@ -50,16 +50,29 @@ const defaultReplies = {
         apiError: statusCode => `⛔️ Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte. [${statusCode}]`,
         noTrips: (origin, destination) =>
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
-        noTripsWithUrl: (origin, destination, url) =>
-            `Para buscar viagens de ${origin} para ${destination}, utilize este link: ${url}`,
-        listItem: (company, departure, arrival, seats) =>
-            `${company}: ${departure.name} ${departure.time} 🚌 ${arrival.name} ${arrival.time}, ${seats} lugares disponíveis.`,
-        filteredDepartureListAfter: (origin, destination, day, optionsSize, url, options) =>
-            `De ${origin} para ${destination} ${dayString(day, dayStrings)} depois das ${day.format('HH:mm')} tenho ${optionsSize} ${optionsSize !== 1 ? 'opções' : 'opção'} ${options ? `:\n\n${options}` : '.'}\n\nPara ver todas as opções desse dia acesse ${url}`,
-        filteredDepartureListBetween: (origin, destination, from, to, optionsSize, url, options) =>
-            `De ${origin} para ${destination} ${dayString(from, dayStrings)} entre ${from.format('HH:mm')} e ${to.format('HH:mm')} tenho ${optionsSize} ${optionsSize !== 1 ? 'opções' : 'opção'}${options ? `:\n\n${options}` : '.'}\n\nPara ver todas as opções desse dia acesse ${url}`,
-        departureList: (origin, destination, day, optionsSize, url, options) =>
-            `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opções ${options ? `:\n\n${options}` : '.'}\n\nPara reservar acesse ${url}`
+        noTripsWithUrl: (origin, destination) =>
+            `Não encontrei nenhuma viagem de ${origin} para ${destination}`,
+        listTitle: (company, departure, seats, duration, price) =>
+            `${company} ${departure.format('HH:mm')}, ${price}, ${seats} lugar${seats !== '1' ? 'es' : ''}, ${durationFormat(duration)}`,
+        listItemTg: (company, departure, arrival, seats, duration) =>
+            `${company}: ${departure.name} ${departure.time} 🚌  ${arrival.name} ${arrival.time}, ${duration} minutos ${seats} lugar${seats !== '1' ? 'es' : ''} disponíve${seats !== '1' ? 'is' : 'l'}.`,
+        listItemFb: (company, departure, arrival, seats, duration) =>
+            `${departure.name} ${departure.time} → ${arrival.name} ${arrival.time}, ${duration} minutos.`,
+        filteredDepartureListAfter: (origin, destination, day, optionsSize, url, options) => ({
+            header: `De ${origin} para ${destination} ${dayString(day, dayStrings)} depois das ${day.format('HH:mm')} tenho ${optionsSize} ${optionsSize !== 1 ? 'opções' : 'opção'}:`,
+            body: `${options ? `:\n\n${options}` : '.'}`,
+            footer: `Para ver todas as opções desse dia acesse ${url}`
+        }),
+        filteredDepartureListBetween: (origin, destination, from, to, optionsSize, url, options) => ({
+            header: `De ${origin} para ${destination} ${dayString(from, dayStrings)} entre ${from.format('HH:mm')} e ${to.format('HH:mm')} tenho ${optionsSize} ${optionsSize !== 1 ? 'opções' : 'opção'}:`,
+            body: `${options ? `:\n\n${options}` : '.'}`,
+            footer: `Para ver todas as opções desse dia acesse ${url}`
+        }),
+        departureList: (origin, destination, day, optionsSize, url, options) => ({
+            header: `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opç${optionsSize !== 1 ? 'ões' : 'ão'}:`,
+            body: `${options ? `:\n\n${options}` : '.'}`,
+            footer: `Para reservar acesse ${url}`
+        })
     },
     // ## Unexpected answer
     unknown: DEBUG_TO_LOGFILE

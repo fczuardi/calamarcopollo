@@ -143,6 +143,7 @@ const onUpdate = async ({ bot, update }) => {
                 busCompany,
                 availableSeats
             } = firstPart;
+            const price = departure.waypoint.prices[0].price;
             const beginTime = departure.waypoint.schedule;
             const endTime = arrival.waypoint.schedule;
             const departurePlace = departure.waypoint.place.city;
@@ -151,16 +152,19 @@ const onUpdate = async ({ bot, update }) => {
             const arrivalTime = moment(`${endTime.date} ${endTime.time}.000-03`);
             const duration = arrivalTime.diff(departureTime, 'minutes');
             const busCompanyName = busCompany.name;
+            const busCompanyLogo = busCompany.logo
             console.log(
 `${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration} - ${availableSeats}`
             );
             return {
+                price,
                 departurePlace,
                 arrivalPlace,
                 departureTime,
                 arrivalTime,
                 duration,
                 busCompanyName,
+                busCompanyLogo,
                 availableSeats
             };
         });
@@ -180,6 +184,46 @@ const onUpdate = async ({ bot, update }) => {
                 return resolve(tripDialogReply(nextContext));
             });
         });
+
+        if (
+            botType === 'facebookMessenger' &&
+            secondReply.structuredRely &&
+            secondReply.structuredRely.length > 0
+        ) {
+            return bot.sendMessage({
+                ...sendMessageOptions,
+                text: secondReply.textReply.header
+            }).then(() => {
+                bot.sendMessage({
+                    ...sendMessageOptions,
+                    attachment: {
+                        type: 'template',
+                        payload: {
+                            template_type: 'generic',
+                            elements: secondReply.structuredRely.slice(0, 10)
+                        }
+                    }
+                }).then(() => {
+                    bot.sendMessage({
+                        ...sendMessageOptions,
+                        text: secondReply.textReply.footer
+                    });
+                });
+            });
+        }
+
+        if (secondReply.textReply) {
+            return bot.sendMessage({
+                ...sendMessageOptions,
+                text: [
+                    secondReply.textReply.header,
+                    secondReply.textReply.body,
+                    '\n\n',
+                    secondReply.textReply.footer
+                ].join('')
+            });
+        }
+
         return bot.sendMessage({
             ...sendMessageOptions,
             text: secondReply

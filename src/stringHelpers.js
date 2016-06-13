@@ -21,6 +21,15 @@ const dayString = (d, dayStrings) => {
     return day.format('LL');
 };
 
+const durationFormat = minutes => {
+    const m = parseInt(minutes, 10);
+    const hours = Math.floor(m / 60);
+    const min = m - (hours * 60);
+    return hours < 1
+        ? `${min}min`
+        : `${hours}h${min}min`;
+};
+
 const polloSanitize = text => latinize(text)
     .toLowerCase()
     // remove botusername
@@ -29,4 +38,4 @@ const polloSanitize = text => latinize(text)
     .replace(/rio de janeiro/, 'riodejaneiro')
 ;
 
-export { dayString, polloSanitize };
+export { dayString, polloSanitize, durationFormat };
