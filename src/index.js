@@ -133,7 +133,9 @@ const onUpdate = async ({ bot, update }) => {
         const rawTrips = apiResult.items;
         console.log(`${rawTrips.length} trips`);
         // console.log(JSON.stringify(rawTrips, ' ', 2));
-        const trips = rawTrips.map(trip => {
+        const trips = rawTrips.filter(
+            trip => trip.parts && trip.parts[0] && trip.parts[0].availableSeats > 0
+        ).map(trip => {
             const firstPart = trip.parts[0];
             const {
                 departure,
@@ -150,7 +152,7 @@ const onUpdate = async ({ bot, update }) => {
             const duration = arrivalTime.diff(departureTime, 'minutes');
             const busCompanyName = busCompany.name;
             console.log(
-`${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration}`
+`${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration} - ${availableSeats}`
             );
             return {
                 departurePlace,
@@ -162,7 +164,8 @@ const onUpdate = async ({ bot, update }) => {
                 availableSeats
             };
         });
-        console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
+        // console.log('trips', trips);
+        // console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
 
         const srcSlug = context.originMeta.slugs[0];
         const destSlug = context.destinationMeta.slugs[0];
