@@ -26,6 +26,7 @@ const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
 const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
 const CLICKBUS_WEB_URL_DATE_PARAM = process.env.CLICKBUS_WEB_URL_DATE_PARAM;
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
+const POLLO_PATH = process.env.POLLO_PATH;
 
 const store = createStore();
 const onUpdate = async ({ bot, update }) => {
@@ -264,7 +265,7 @@ const port = process.env.PORT;
 const callbackPath = process.env.FB_CALLBACK_PATH;
 const listeners = { onUpdate };
 const staticFiles = [
-    { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: './src/autopost.html' }
+    { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: `${POLLO_PATH}/src/autopost.html` }
 ];
 const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners, staticFiles });
 
