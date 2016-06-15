@@ -20,6 +20,7 @@ import { appendFile } from 'fs';
 
 const googleUrl = new GoogleURL({ key: process.env.GOOGLE_API_KEY });
 
+const CLICKBUS_URL = process.env.CLICKBUS_URL;
 const CLICKBUS_API_KEY = process.env.CLICKBUS_API_KEY;
 const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
 const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
@@ -110,16 +111,23 @@ const onUpdate = async ({ bot, update }) => {
             text: replyText
         });
         console.log(`requesting ${reply.url}`);
-        const apiOptions = {
+        const apiTripRequestOptions = {
             uri: reply.url,
             headers: {
                 'X-API-KEY': CLICKBUS_API_KEY
             }
         };
+        const apiSessionRequestOptions = {
+            ...apiTripRequestOptions,
+            uri: `${CLICKBUS_URL}/session`
+        };
         let responseBody;
+        let sessionBody;
         try {
-            responseBody = await request(apiOptions);
+            responseBody = await request(apiTripRequestOptions);
+            sessionBody = await request(apiSessionRequestOptions);
         } catch (err) {
+            console.log('___err___', err);
             const { statusCode } = err;
             const nextContext = Object.assign({}, context, { apiError: statusCode });
             const errorReply = tripDialogReply(nextContext);
@@ -129,6 +137,7 @@ const onUpdate = async ({ bot, update }) => {
             });
         }
         console.log('reply arrived');
+        const sessionCookie = JSON.parse(sessionBody).content;
         const apiResult = JSON.parse(responseBody);
         const rawTrips = apiResult.items;
         console.log(`${rawTrips.length} trips`);
@@ -145,6 +154,7 @@ const onUpdate = async ({ bot, update }) => {
             } = firstPart;
             const price = departure.waypoint.prices[0].price;
             const beginTime = departure.waypoint.schedule;
+            const scheduleId = beginTime.id;
             const endTime = arrival.waypoint.schedule;
             const departurePlace = departure.waypoint.place.city;
             const departureTime = moment(`${beginTime.date} ${beginTime.time}.000-03`);
@@ -152,7 +162,7 @@ const onUpdate = async ({ bot, update }) => {
             const arrivalTime = moment(`${endTime.date} ${endTime.time}.000-03`);
             const duration = arrivalTime.diff(departureTime, 'minutes');
             const busCompanyName = busCompany.name;
-            const busCompanyLogo = busCompany.logo
+            const busCompanyLogo = busCompany.logo;
             console.log(
 `${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration} - ${availableSeats}`
             );
@@ -165,7 +175,8 @@ const onUpdate = async ({ bot, update }) => {
                 duration,
                 busCompanyName,
                 busCompanyLogo,
-                availableSeats
+                availableSeats,
+                scheduleId
             };
         });
         // console.log('trips', trips);
@@ -180,7 +191,11 @@ const onUpdate = async ({ bot, update }) => {
         const secondReply = await new Promise(resolve => {
             googleUrl.shorten(url, (err, shortUrl) => {
                 console.log('URL shortened', shortUrl);
-                const nextContext = Object.assign({}, context, { trips, shortUrl });
+                const nextContext = Object.assign({}, context, {
+                    trips,
+                    shortUrl,
+                    sessionCookie
+                });
                 return resolve(tripDialogReply(nextContext));
             });
         });
@@ -248,7 +263,10 @@ const onUpdate = async ({ bot, update }) => {
 const port = process.env.PORT;
 const callbackPath = process.env.FB_CALLBACK_PATH;
 const listeners = { onUpdate };
-const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners });
+const staticFiles = [
+    { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: './src/autopost.html' }
+];
+const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners, staticFiles });
 
 //
 fbBot.launchPromise.then(serverStatus => {

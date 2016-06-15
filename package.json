@@ -62,7 +62,7 @@
     "shelljs": "^0.7.0"
   },
   "dependencies": {
-    "calamars": "^0.12.9",
+    "calamars": "^0.12.10",
     "fake-clickbus-api": "^0.1.31",
     "google-url": "0.0.4",
     "latinize": "^0.2.0",
