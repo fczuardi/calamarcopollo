@@ -20,9 +20,10 @@ const defaultReplies = {
     // ## Commands
     version: v => `v${v}`,
     help: () => 'Tente consultar um horário de ônibus, por exemplo: horários de São Paulo para Rio de Janeiro',
-    start: () => PRIVACY_POLICY_ON_START
+    start: () => (PRIVACY_POLICY_ON_START
         ? 'AVISO: Você está conversando com uma versão de desenvolvimento do bot "calamarcopollo" e qualquer frase que você digitar pode ficar publicamente logada na web. Portanto não digite nada privado para este bot. DICA: sempre que quiser recomeçar a interação do zero, digite /restart'
-        : 'Bem vindo, em que posso ajudar?',
+        : 'Bem vindo, em que posso ajudar?'
+    ),
     restart: () => 'OK, vamos recomeçar do zero.',
     // ## Insult
     insult: () => 'Eu sou um robô e meu trabalho é servir, faço o possível mas nem sempre acerto… pode extravazar seu descontentamento em mim, eu mereço.',
@@ -72,7 +73,8 @@ const defaultReplies = {
             header: `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opç${optionsSize !== 1 ? 'ões' : 'ão'}:`,
             body: `${options ? `:\n\n${options}` : '.'}`,
             footer: `Para reservar acesse ${url}`
-        })
+        }),
+        detail: () => 'Checar'
     },
     // ## Unexpected answer
     unknown: DEBUG_TO_LOGFILE

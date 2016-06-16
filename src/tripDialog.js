@@ -62,7 +62,7 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
             buttons: [{
                 type: 'web_url',
                 url,
-                title: 'Comprar'
+                title: replies.trip.detail()
             }],
             subtitle
         };
