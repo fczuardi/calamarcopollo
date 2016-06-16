@@ -30,7 +30,7 @@ test('[0.3.0] /version command with wit', versionCommand);
 test('/start command', t => {
     t.is(
         router({ entities: { command: [{ value: 'start' }] } }),
-        replies.start
+        replies.start()
     );
 });
 test('[0.3.0] /start command with wit', startCommand);
@@ -38,7 +38,7 @@ test('[0.3.0] /start command with wit', startCommand);
 test('/help command', t => {
     t.is(
         router({ entities: { command: [{ value: 'help' }] } }),
-        replies.help
+        replies.help()
     );
 });
 test('[0.3.0] /help command with wit', helpCommand);
@@ -62,7 +62,7 @@ test('/restart command', t => {
                 date: chatDate
             }
         ),
-        replies.restart
+        replies.restart()
     );
     t.deepEqual(store.getState(), nextState);
 });
@@ -75,7 +75,7 @@ test('[0.3.0] /restart command with wit', restartCommand);
 test('interaction close', t => {
     t.is(
         router({ entities: { interaction: [{ value: 'close' }] } }),
-        replies.close
+        replies.close()
     );
 });
 test('[0.3.0] interaction close with wit', goodbye);
@@ -83,7 +83,7 @@ test('[0.3.0] interaction close with wit', goodbye);
 test('interaction greeting', t => {
     t.is(router({
         entities: { interaction: [{ value: 'greeting' }] }
-    }), replies.greeting.noUsername);
+    }), replies.greeting.noUsername());
 });
 test('[0.3.0] interaction greeting with wit', greeting);
 
