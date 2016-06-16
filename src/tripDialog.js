@@ -91,13 +91,13 @@ const tripDialogReply = context => {
         return replies.trip.apiError(apiError);
     }
     if (!hasOrigin && !hasDestination) {
-        return replies.trip.noPlaces;
+        return replies.trip.noPlaces();
     }
     if (hasOrigin && !hasDestination) {
-        return replies.trip.noDestination;
+        return replies.trip.noDestination();
     }
     if (hasDestination && !hasOrigin) {
-        return replies.trip.noOrigin;
+        return replies.trip.noOrigin();
     }
     const day = timeFilter && timeFilter.from
         ? moment(timeFilter.from.value) : moment();

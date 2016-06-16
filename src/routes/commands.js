@@ -10,15 +10,15 @@ const routes = [[
     replies.version(version)
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'start',
-    replies.start
+    replies.start()
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'help',
-    replies.help
+    replies.help()
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'restart',
     (outcomes, { store, chat, date }) => {
         store.dispatch(updateChatSession({ date, chat: { ...chat, session: {} } }));
-        return replies.restart;
+        return replies.restart();
     }
 ]];
 export default routes;
