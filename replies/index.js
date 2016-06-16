@@ -77,9 +77,10 @@ const defaultReplies = {
         detail: () => 'Checar'
     },
     // ## Unexpected answer
-    unknown: DEBUG_TO_LOGFILE
+    unknown: () => (DEBUG_TO_LOGFILE
         ? () => 'não entendi 😥'
         : debug => `Vixe, me confundi. ${debug}`
+    )
 };
 /* eslint-enable max-len */
 

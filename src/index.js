@@ -273,7 +273,7 @@ const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners, staticFi
 fbBot.launchPromise.then(serverStatus => {
     console.log('serverStatus', serverStatus, port);
     fbBot.setWelcomeMessage({
-        text: replies.start
+        text: replies.start()
     }).then(welcomeMsgSetResult =>
         console.log('welcomeMsgSetResult', welcomeMsgSetResult)
     );
