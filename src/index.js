@@ -158,9 +158,9 @@ const onUpdate = async ({ bot, update }) => {
             const scheduleId = beginTime.id;
             const endTime = arrival.waypoint.schedule;
             const departurePlace = departure.waypoint.place.city;
-            const departureTime = moment(`${beginTime.date} ${beginTime.time}.000-03`);
+            const departureTime = moment(`${beginTime.date} ${beginTime.time}`);
             const arrivalPlace = arrival.waypoint.place.city;
-            const arrivalTime = moment(`${endTime.date} ${endTime.time}.000-03`);
+            const arrivalTime = moment(`${endTime.date} ${endTime.time}`);
             const duration = arrivalTime.diff(departureTime, 'minutes');
             const busCompanyName = busCompany.name;
             const busCompanyLogo = busCompany.logo;
@@ -268,6 +268,8 @@ const staticFiles = [
     { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: `${POLLO_PATH}/src/autopost.html` }
 ];
 const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners, staticFiles });
+
+console.log(moment().format());
 
 //
 fbBot.launchPromise.then(serverStatus => {
