@@ -7,7 +7,7 @@ const { getEntityValue } = WitDriver;
 
 const routes = [[
     outcomes => getEntityValue(outcomes, 'command') === 'version',
-    (v) => replies.version(v)
+    () => replies.version(version)
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'start',
     replies.start
