@@ -33,6 +33,10 @@ const defaultReplies = {
         username: username => `Olá ${username}, em que posso ajudar?`
     },
     close: () => ':)',
+    laugh:() => `hehehe`,
+    compliment: () => `Muito obrigado!`,
+    nameOrigin: () => `Por que a galinha atravessou a rua? :P`,
+    howAreYou: () => `Vou bem, obrigado!`,
     // ## FAQ
     faq: faqReply,
     // ## Trip
