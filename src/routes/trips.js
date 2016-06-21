@@ -45,7 +45,9 @@ const routes = [[
         } = extractEntities(outcomes);
         const context = chat && chat.session ? chat.session : {};
         let nextContext = Object.assign({}, context);
-        nextContext.timeFilter = timeFilter;
+        if (timeFilter) {
+            nextContext.timeFilter = timeFilter;
+        }
         if (destination && destination.confidence >= placesConfidenceThreshold) {
             nextContext.destination = destination.value;
             nextContext.destinationMeta = destinationMeta;
@@ -92,11 +94,22 @@ const routes = [[
         return tripDialogReply(nextContext);
     }
 ], [
-    outcomes => (getEntityValue(outcomes, 'trip') !== 'info' && (
-        getEntityValue(outcomes, 'places') ||
-        getEntityValue(outcomes, 'origin') ||
-        getEntityValue(outcomes, 'destination'
-    ))),
+    outcomes => {
+        const {
+            unknownPlace,
+            origin,
+            destination,
+            timeFilter
+        } = extractEntities(outcomes);
+        const place = unknownPlace || origin || destination;
+        const result = (
+            (origin && destination) ||
+            (unknownPlace && destination) ||
+            place ||
+            timeFilter
+        );
+        return result;
+    },
     (outcomes, { store, chat } = {}) => {
         const context = chat && chat.session ? chat.session : {};
         const {
@@ -108,32 +121,28 @@ const routes = [[
         const place = unknownPlace || origin || destination;
         const placeMeta = getEntityMeta(place);
         let nextContext = Object.assign({}, context);
-        nextContext.timeFilter = timeFilter;
-        if (origin && destination) {
-            console.log('[issue #24, comment 1] has origin and destination');
-            nextContext.origin = origin.value;
-            nextContext.originMeta = getEntityMeta(origin);
+        if (timeFilter) {
+            nextContext.timeFilter = timeFilter;
+        }
+        if (destination) {
             nextContext.destination = destination.value;
             nextContext.destinationMeta = getEntityMeta(destination);
+        }
+        if (origin) {
+            nextContext.origin = origin.value;
+            nextContext.originMeta = getEntityMeta(origin);
         }
         if (unknownPlace && destination) {
             console.log('[issue #24] has places with no role and destination');
             nextContext.origin = unknownPlace.value;
             nextContext.originMeta = getEntityMeta(unknownPlace);
-            nextContext.destination = destination.value;
-            nextContext.destinationMeta = getEntityMeta(destination);
         }
-        if (nextContext.destination && !nextContext.origin) {
+        if (nextContext.destination && !nextContext.origin && place) {
             nextContext.origin = place.value;
             nextContext.originMeta = placeMeta;
-        } else if (
-            (!nextContext.destination && nextContext.origin) ||
-            (!nextContext.destination && !nextContext.origin)
-        ) {
+        } else {
             nextContext.destination = place.value;
-            if (placeMeta) {
-                nextContext.destinationMeta = placeMeta;
-            }
+            nextContext.destinationMeta = placeMeta;
         }
         if (store) {
             store.dispatch(updateChatSession({
