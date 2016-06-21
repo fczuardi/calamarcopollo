@@ -10,10 +10,10 @@ const routes = [[
     (v) => replies.version(v)
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'start',
-    replies.start()
+    replies.start
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'help',
-    replies.help()
+    replies.help
 ], [
     outcomes => getEntityValue(outcomes, 'command') === 'restart',
     (outcomes, { store, chat, date }) => {
