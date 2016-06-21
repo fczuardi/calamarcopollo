@@ -5,6 +5,71 @@ const CLICKBUS_URL = process.env.CLICKBUS_URL;
 
 const tripListSizeThreshold = 10;
 
+const buildFacebookElements = (origin, destination, session, searchUrl, trips) => {
+    console.log('buildFacebookElements');
+    const result = trips.map(trip => {
+        const {
+            price,
+            arrivalTime,
+            arrivalPlace,
+            departurePlace,
+            departureTime,
+            busCompanyName,
+            // busCompanyLogo,
+            availableSeats,
+            duration,
+            scheduleId
+        } = trip;
+        const departure = {
+            time: moment(departureTime).format('DD/MM HH:mm'),
+            name: departurePlace
+        };
+        const arrival = {
+            time: moment(arrivalTime).format('DD/MM HH:mm'),
+            name: arrivalPlace
+        };
+        const company = busCompanyName;
+        const seats = availableSeats;
+        const formattedPrice = `R$${price.slice(0, -2)},${price.slice(-2)}`;
+        const title = replies.trip.listTitle(
+            company, departureTime, availableSeats, duration, formattedPrice
+        );
+        const subtitle = replies.trip.listItemFb(company, departure, arrival, seats, duration, true);
+        const baseURL = `${process.env.BOT_URL}${process.env.POST_TO_CLICKBUS_HACK_PATH}`;
+        const decodedScheduleTrip = new Buffer(scheduleId, 'base64').toString('utf8');
+        const trips0 = decodedScheduleTrip.split('--').map((item, index) => {
+            if ([2, 4, 8, 9].includes(index)) {
+                return `"${item}"`;
+            }
+            if (index === 7) {
+                return item === '1';
+            }
+            return parseInt(item, 10);
+        }).toString();
+        const postBody = {
+            originSlug: origin,
+            destinationSlug: destination,
+            trips0,
+            store: process.env.CLICKBUS_STORE,
+            platform: process.env.CLICKBUS_PLATFORM
+        };
+        const postURL = process.env.CLICKBUS_WEB_POST_URL;
+        const failUrl = searchUrl;
+        const url = `${baseURL}?body=${JSON.stringify(postBody)}&url=${postURL}&session=${session}&failUrl=${failUrl}`;
+        return {
+            title,
+            // image_url: busCompanyLogo,
+            buttons: [{
+                type: 'web_url',
+                url,
+                title: replies.trip.detail()
+            }],
+            subtitle
+        };
+    });
+    return result.slice(0, 10);
+};
+
 const tripDialogReply = context => {
     const {
         origin,
@@ -14,7 +79,8 @@ const tripDialogReply = context => {
         timeFilter,
         apiError,
         trips,
-        shortUrl
+        shortUrl,
+        sessionCookie
     } = context;
     const hasOrigin = origin !== undefined;
     const hasDestination = destination !== undefined;
@@ -25,13 +91,13 @@ const tripDialogReply = context => {
         return replies.trip.apiError(apiError);
     }
     if (!hasOrigin && !hasDestination) {
-        return replies.trip.noPlaces;
+        return replies.trip.noPlaces();
     }
     if (hasOrigin && !hasDestination) {
-        return replies.trip.noDestination;
+        return replies.trip.noDestination();
     }
     if (hasDestination && !hasOrigin) {
-        return replies.trip.noOrigin;
+        return replies.trip.noOrigin();
     }
     const day = timeFilter && timeFilter.from
         ? moment(timeFilter.from.value) : moment();
@@ -78,16 +144,28 @@ const tripDialogReply = context => {
                 const company = trip.busCompanyName;
                 const seats = trip.availableSeats;
 
-                return replies.trip.listItem(company, departure, arrival, seats);
-            }).join('\n');
-            return replies.trip.filteredDepartureListAfter(
-                origin,
-                destination,
-                moment(timeFilter.from.value),
-                filteredTripsAfter.length,
+                return replies.trip.listItemTg(company, departure, arrival, seats);
+            });
+            const structuredRely = buildFacebookElements(
+                originMeta.slugs[0],
+                destinationMeta.slugs[0],
+                sessionCookie,
                 shortUrl,
-                (filteredTripsAfter.length < tripListSizeThreshold) ? tripListAfter : null
+                filteredTripsAfter
             );
+            return {
+                textReply: replies.trip.filteredDepartureListAfter(
+                    origin,
+                    destination,
+                    moment(timeFilter.from.value),
+                    filteredTripsAfter.length,
+                    shortUrl,
+                    (filteredTripsAfter.length < tripListSizeThreshold)
+                        ? tripListAfter.join('\n')
+                        : null
+                ),
+                structuredRely
+            };
         }
         const filteredTripsBetween = filteredTripsAfter.filter(trip =>
             trip.departureTime.isBefore(timeFilter.to.value)
@@ -103,17 +181,29 @@ const tripDialogReply = context => {
             };
             const company = trip.busCompanyName;
             const seats = trip.availableSeats;
-            return replies.trip.listItem(company, departure, arrival, seats);
+            return replies.trip.listItemTg(company, departure, arrival, seats);
         }).join('\n');
-        return replies.trip.filteredDepartureListBetween(
-            origin,
-            destination,
-            moment(timeFilter.from.value),
-            moment(timeFilter.to.value),
-            filteredTripsBetween.length,
+        const structuredRely = buildFacebookElements(
+            originMeta.slugs[0],
+            destinationMeta.slugs[0],
+            sessionCookie,
             shortUrl,
-            (filteredTripsBetween.length < tripListSizeThreshold) ? tripListBetween : null
+            filteredTripsBetween
         );
+        return {
+            textReply: replies.trip.filteredDepartureListBetween(
+                origin,
+                destination,
+                moment(timeFilter.from.value),
+                moment(timeFilter.to.value),
+                filteredTripsBetween.length,
+                shortUrl,
+                (filteredTripsBetween.length < tripListSizeThreshold)
+                    ? tripListBetween
+                    : null
+            ),
+            structuredRely
+        };
     }
     const tripList = trips.map(trip => {
         const departure = {
@@ -126,16 +216,27 @@ const tripDialogReply = context => {
         };
         const company = trip.busCompanyName;
         const seats = trip.availableSeats;
-        return replies.trip.listItem(company, departure, arrival, seats);
+        return replies.trip.listItemTg(company, departure, arrival, seats);
     }).join('\n');
-    return replies.trip.departureList(
-        origin,
-        destination,
-        departureDay,
-        trips.length,
+    const structuredRely = buildFacebookElements(
+        originMeta.slugs[0],
+        destinationMeta.slugs[0],
+        sessionCookie,
         shortUrl,
-        trips.length < tripListSizeThreshold ? tripList : null
+        trips
     );
+    // console.log('structuredRely', JSON.stringify(structuredRely));
+    return {
+        textReply: replies.trip.departureList(
+            origin,
+            destination,
+            departureDay,
+            trips.length,
+            shortUrl,
+            trips.length < tripListSizeThreshold ? tripList : null
+        ),
+        structuredRely
+    };
 };
 
 export { tripDialogReply };

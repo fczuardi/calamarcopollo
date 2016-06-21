@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Redirecting…</title>
+</head>
+
+<body id="home">
+    <form id="postData" method="POST"></form>
+</body>
+<script>
+var queryString = document.location.search.replace('?', '');
+var defaultFailUrl = 'https://github.com/fczuardi/calamarcopollo';
+var failUrl = queryString.indexOf('failUrl=') !== -1
+    ? decodeURIComponent(queryString.replace(/.*failUrl=/, '')) || defaultFailUrl
+    : defaultFailUrl;
+try {
+    var searchParams = new URLSearchParams(queryString);
+    var formElement = document.getElementById('postData');
+
+    // set session cookie based on query string parameter
+    var sessionId = searchParams.get('session');
+    console.log('sessionId', sessionId);
+    document.cookie = "PHPSESSID=" + sessionId;
+
+    // set form url
+    var postUrl = searchParams.get('url');
+    console.log('postUrl', postUrl);
+    formElement.action = postUrl;
+
+    // set form parameters
+    var bodyContents = searchParams.get('body');
+    var parsedBody = JSON.parse(bodyContents);
+
+    var originSlug = document.createElement('input');
+    originSlug.name = 'origin_slug';
+    originSlug.value = parsedBody.originSlug;
+    originSlug.type = 'hidden';
+    formElement.appendChild(originSlug);
+
+    var destinationSlug = document.createElement('input');
+    destinationSlug.name = 'destination_slug';
+    destinationSlug.value = parsedBody.destinationSlug;
+    destinationSlug.type = 'hidden';
+    formElement.appendChild(destinationSlug);
+
+    var trips0 = document.createElement('input');
+    trips0.name = 'trips[0]';
+    trips0.value = '[' + parsedBody.trips0 + ']';
+    trips0.type = 'hidden';
+    formElement.appendChild(trips0);
+
+    var urlInput = document.createElement('input');
+    urlInput.name = 'url';
+    urlInput.value = failUrl;
+    urlInput.type = 'hidden';
+    formElement.appendChild(urlInput);
+
+    var storeInput = document.createElement('input');
+    storeInput.name = 'store';
+    storeInput.value = parsedBody.store;
+    storeInput.type = 'hidden';
+    formElement.appendChild(storeInput);
+
+    var platformInput = document.createElement('input');
+    platformInput.name = 'platform';
+    platformInput.value = parsedBody.platform;
+    platformInput.type = 'hidden';
+    formElement.appendChild(platformInput);
+
+	formElement.submit();
+} catch (e) {
+    console.log(e);
+    console.log(failUrl);
+    window.location.href = failUrl;
+}
+</script>
+</html>

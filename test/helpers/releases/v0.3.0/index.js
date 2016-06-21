@@ -26,7 +26,7 @@ const startCommand = async t => {
     const expressions = cmd.start;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        router(outcome), replies.start, `Expression: ${expressions[i]}`
+        router(outcome), replies.start(), `Expression: ${expressions[i]}`
     ));
 };
 
@@ -42,7 +42,7 @@ const helpCommand = async t => {
     const expressions = cmd.help;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        router(outcome), replies.help, `Expression: ${expressions[i]}`
+        router(outcome), replies.help(), `Expression: ${expressions[i]}`
     ));
 };
 
@@ -50,7 +50,7 @@ const restartCommand = async t => {
     const expressions = cmd.restart;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        router(outcome, { store }), replies.restart, `Expression: ${expressions[i]}`
+        router(outcome, { store }), replies.restart(), `Expression: ${expressions[i]}`
     ));
 };
 
@@ -60,7 +60,7 @@ const greeting = async t => {
     const expressions = interaction.greeting;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        router(outcome), replies.greeting.noUsername,
+        router(outcome), replies.greeting.noUsername(),
         `Expression: ${expressions[i]}`
     ));
 };
@@ -79,7 +79,7 @@ const goodbye = async t => {
     const expressions = interaction.close;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        router(outcome), replies.close,
+        router(outcome), replies.close(),
         `Expression: ${expressions[i]}`
     ));
 };
@@ -158,6 +158,7 @@ const tripOriginDestinationDepartureTimeFail = async t => {
         } : null;
         t.is(getEntityValue(outcome, 'trip'), 'info', message);
         t.truthy(timeFilter, `timeFilter ${message}`);
+        t.is(timeFilter.grain, 'hour', `timeFilter ${message}`);
         t.truthy(origins[0], `origin ${message}`);
         t.truthy(destination || place || origins[1]
         , `destination ${message}`);
@@ -191,7 +192,7 @@ const routerPlaceWithNoRoleNoTripInfo = async t => {
     const outcome = { entities: {
         places: [{ value: 'Sertãozinho' }]
     } };
-    t.is(router(outcome), replies.trip.noOrigin);
+    t.is(router(outcome), replies.trip.noOrigin());
 };
 
 const routerTripInfoPlaceWithNoRole = async t => {
@@ -199,7 +200,7 @@ const routerTripInfoPlaceWithNoRole = async t => {
         trip: [{ value: 'info' }],
         places: [{ value: 'Bauru' }]
     } };
-    t.is(router(outcome), replies.trip.noOrigin);
+    t.is(router(outcome), replies.trip.noOrigin());
 };
 
 const routerTripInfo2PlacesWithNoRole = async t => {

@@ -20,11 +20,13 @@ import { appendFile } from 'fs';
 
 const googleUrl = new GoogleURL({ key: process.env.GOOGLE_API_KEY });
 
+const CLICKBUS_URL = process.env.CLICKBUS_URL;
 const CLICKBUS_API_KEY = process.env.CLICKBUS_API_KEY;
 const CLICKBUS_WEB_URL = process.env.CLICKBUS_WEB_URL;
 const CLICKBUS_UTM_PARAMS = process.env.CLICKBUS_UTM_PARAMS || '';
 const CLICKBUS_WEB_URL_DATE_PARAM = process.env.CLICKBUS_WEB_URL_DATE_PARAM;
 const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
+const POLLO_PATH = process.env.POLLO_PATH;
 
 const store = createStore();
 const onUpdate = async ({ bot, update }) => {
@@ -110,16 +112,23 @@ const onUpdate = async ({ bot, update }) => {
             text: replyText
         });
         console.log(`requesting ${reply.url}`);
-        const apiOptions = {
+        const apiTripRequestOptions = {
             uri: reply.url,
             headers: {
                 'X-API-KEY': CLICKBUS_API_KEY
             }
         };
+        const apiSessionRequestOptions = {
+            ...apiTripRequestOptions,
+            uri: `${CLICKBUS_URL}/session`
+        };
         let responseBody;
+        let sessionBody;
         try {
-            responseBody = await request(apiOptions);
+            responseBody = await request(apiTripRequestOptions);
+            sessionBody = await request(apiSessionRequestOptions);
         } catch (err) {
+            console.log('___err___', err);
             const { statusCode } = err;
             const nextContext = Object.assign({}, context, { apiError: statusCode });
             const errorReply = tripDialogReply(nextContext);
@@ -129,11 +138,14 @@ const onUpdate = async ({ bot, update }) => {
             });
         }
         console.log('reply arrived');
+        const sessionCookie = JSON.parse(sessionBody).content;
         const apiResult = JSON.parse(responseBody);
         const rawTrips = apiResult.items;
         console.log(`${rawTrips.length} trips`);
         // console.log(JSON.stringify(rawTrips, ' ', 2));
-        const trips = rawTrips.map(trip => {
+        const trips = rawTrips.filter(
+            trip => trip.parts && trip.parts[0] && trip.parts[0].availableSeats > 0
+        ).map(trip => {
             const firstPart = trip.parts[0];
             const {
                 departure,
@@ -141,28 +153,35 @@ const onUpdate = async ({ bot, update }) => {
                 busCompany,
                 availableSeats
             } = firstPart;
+            const price = departure.waypoint.prices[0].price;
             const beginTime = departure.waypoint.schedule;
+            const scheduleId = beginTime.id;
             const endTime = arrival.waypoint.schedule;
             const departurePlace = departure.waypoint.place.city;
-            const departureTime = moment(`${beginTime.date} ${beginTime.time}.000-03`);
+            const departureTime = moment(`${beginTime.date} ${beginTime.time}`);
             const arrivalPlace = arrival.waypoint.place.city;
-            const arrivalTime = moment(`${endTime.date} ${endTime.time}.000-03`);
+            const arrivalTime = moment(`${endTime.date} ${endTime.time}`);
             const duration = arrivalTime.diff(departureTime, 'minutes');
             const busCompanyName = busCompany.name;
+            const busCompanyLogo = busCompany.logo;
             console.log(
-`${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration}`
+`${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration} - ${availableSeats}`
             );
             return {
+                price,
                 departurePlace,
                 arrivalPlace,
                 departureTime,
                 arrivalTime,
                 duration,
                 busCompanyName,
-                availableSeats
+                busCompanyLogo,
+                availableSeats,
+                scheduleId
             };
         });
-        console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
+        // console.log('trips', trips);
+        // console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
 
         const srcSlug = context.originMeta.slugs[0];
         const destSlug = context.destinationMeta.slugs[0];
@@ -173,10 +192,54 @@ const onUpdate = async ({ bot, update }) => {
         const secondReply = await new Promise(resolve => {
             googleUrl.shorten(url, (err, shortUrl) => {
                 console.log('URL shortened', shortUrl);
-                const nextContext = Object.assign({}, context, { trips, shortUrl });
+                const nextContext = Object.assign({}, context, {
+                    trips,
+                    shortUrl,
+                    sessionCookie
+                });
                 return resolve(tripDialogReply(nextContext));
             });
         });
+
+        if (
+            botType === 'facebookMessenger' &&
+            secondReply.structuredRely &&
+            secondReply.structuredRely.length > 0
+        ) {
+            return bot.sendMessage({
+                ...sendMessageOptions,
+                text: secondReply.textReply.header
+            }).then(() => {
+                bot.sendMessage({
+                    ...sendMessageOptions,
+                    attachment: {
+                        type: 'template',
+                        payload: {
+                            template_type: 'generic',
+                            elements: secondReply.structuredRely.slice(0, 10)
+                        }
+                    }
+                }).then(() => {
+                    bot.sendMessage({
+                        ...sendMessageOptions,
+                        text: secondReply.textReply.footer
+                    });
+                });
+            });
+        }
+
+        if (secondReply.textReply) {
+            return bot.sendMessage({
+                ...sendMessageOptions,
+                text: [
+                    secondReply.textReply.header,
+                    secondReply.textReply.body,
+                    '\n\n',
+                    secondReply.textReply.footer
+                ].join('')
+            });
+        }
+
         return bot.sendMessage({
             ...sendMessageOptions,
             text: secondReply
@@ -201,13 +264,18 @@ const onUpdate = async ({ bot, update }) => {
 const port = process.env.PORT;
 const callbackPath = process.env.FB_CALLBACK_PATH;
 const listeners = { onUpdate };
-const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners });
+const staticFiles = [
+    { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: `${POLLO_PATH}/src/autopost.html` }
+];
+const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners, staticFiles });
+
+console.log(moment().format());
 
 //
 fbBot.launchPromise.then(serverStatus => {
     console.log('serverStatus', serverStatus, port);
     fbBot.setWelcomeMessage({
-        text: replies.start
+        text: replies.start()
     }).then(welcomeMsgSetResult =>
         console.log('welcomeMsgSetResult', welcomeMsgSetResult)
     );
