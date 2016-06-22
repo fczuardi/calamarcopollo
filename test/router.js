@@ -16,6 +16,10 @@ import {
     routerTripInfo2PlacesWithNoRole
 } from './helpers/releases/v0.3.0';
 
+import {
+    callbackRoutes
+} from './helpers/releases/v0.8.0';
+
 const store = createStore();
 
 // # Commands
@@ -113,4 +117,8 @@ test(
 test(
     '[0.3.0] Expressions with TRIP INFO intent and PLACES with no role',
     routerTripInfo2PlacesWithNoRole
+);
+
+test('[0.8.0] all routes have callback functions and not values',
+    callbackRoutes
 );

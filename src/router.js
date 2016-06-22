@@ -15,3 +15,6 @@ const routes = [
 
 const router = createRouter(routes);
 export default router;
+export {
+    routes
+};
