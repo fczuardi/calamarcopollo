@@ -5,7 +5,10 @@ const routes = [[
     outcomes => getEntityValue(outcomes, 'interaction') === 'close',
     replies.close
 ], [
-    outcomes => getEntityValue(outcomes, 'interaction') === 'laught',
+    outcomes => (
+        getEntityValue(outcomes, 'interaction') === 'laugh' ||
+        getEntityValue(outcomes, 'interaction') === 'laught'
+    ),
     replies.laugh
 ], [
     outcomes => getEntityValue(outcomes, 'interaction') === 'compliment',

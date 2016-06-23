@@ -17,7 +17,9 @@ import {
 } from './helpers/releases/v0.3.0';
 
 import {
-    callbackRoutes
+    callbackRoutes,
+    interactionLaugh,
+    interactionLaughtWit
 } from './helpers/releases/v0.8.0';
 
 const store = createStore();
@@ -122,3 +124,6 @@ test(
 test('[0.8.0] all routes have callback functions and not values',
     callbackRoutes
 );
+
+test('[0.8.0] interaction laugh', interactionLaugh);
+test('[0.8.0] interaction laugh with wit', interactionLaughtWit);

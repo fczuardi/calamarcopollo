@@ -33,7 +33,7 @@ test(
     tripOriginDestinationDepartureTime
 );
 test.failing(
-    '[0.3.0] Failing Expressions with TRIP INFO intent, ORIGIN, DESTINATION, DEPARTURE_DATETIME',
+    '[0.3.0] (known failure) tripOriginDestinationDepartureTimeFail',
     tripOriginDestinationDepartureTimeFail
 );
 test.todo('Cities not on Clickbus API: "bora p/ cravinhos, saindo de joanópolis?"');
