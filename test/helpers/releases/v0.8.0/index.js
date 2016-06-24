@@ -2,7 +2,7 @@ import { WitDriver } from 'calamars';
 import { polloSanitize } from '../../../../src/stringHelpers';
 import router, { routes } from '../../../../src/router';
 import { replies } from '../../../../replies';
-import { interaction, bugs } from './statements';
+import { interaction, bugs, faq } from './statements';
 import { createStore } from '../../../../src/store';
 
 const store = createStore();
@@ -107,6 +107,24 @@ const keepTimeFilterInContext = async t => {
     t.is(context1.session.timeFilter.from.value, context2.session.timeFilter.from.value);
 };
 
+const faqMiado = async t => {
+    const expressions = faq.miado;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        outcome.entities.faq[0].value, 'miado',
+        `Expression: ${expressions[i]}`)
+    );
+};
+
+const faqCat = async t => {
+    const expressions = faq.cat;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        outcome.entities.faq[0].value, 'cat',
+        `Expression: ${expressions[i]}`)
+    );
+};
+
 export {
     callbackRoutes,
     interactionLaugh,
@@ -115,5 +133,7 @@ export {
     interactionNameOriginWit,
     interactionHowAreYouWit,
     knowCitiesWithSlug,
-    keepTimeFilterInContext
+    keepTimeFilterInContext,
+    faqMiado,
+    faqCat
 };

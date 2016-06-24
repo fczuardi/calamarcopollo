@@ -24,7 +24,9 @@ import {
     interactionNameOriginWit,
     interactionHowAreYouWit,
     knowCitiesWithSlug,
-    keepTimeFilterInContext
+    keepTimeFilterInContext,
+    faqMiado,
+    faqCat
 } from './helpers/releases/v0.8.0';
 
 const store = createStore();
@@ -137,3 +139,5 @@ test('[0.8.0] interaction name origin with wit', interactionNameOriginWit);
 test('[0.8.0] interaction how are you with wit', interactionHowAreYouWit);
 test('[0.8.0] cities with dupe entity and no meta', knowCitiesWithSlug);
 test('[0.8.0] timefilter lost bug', keepTimeFilterInContext);
+test('[0.8.0] FAQ miado', faqMiado);
+test('[0.8.0] FAQ cat', faqCat);

@@ -38,6 +38,16 @@ const interaction = {
     ]
 };
 
+const faq = {
+    miado: [
+        'miau'
+    ],
+    cat: [
+        'Oi BOTNAME, você é mesmo um gato?',
+        'Mas você ainda não me disse se é um gato...'
+    ]
+};
+
 const bugs = {
     shouldHaveMeta: [
         'belo horizonte',
@@ -64,6 +74,7 @@ const bugs = {
 };
 
 export {
+    faq,
     interaction,
     bugs
 };
