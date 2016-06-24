@@ -2,7 +2,9 @@ import { WitDriver } from 'calamars';
 import { polloSanitize } from '../../../../src/stringHelpers';
 import router, { routes } from '../../../../src/router';
 import { replies } from '../../../../replies';
-import { interaction } from './statements';
+import { interaction, bugs } from './statements';
+
+const { getEntity, getEntityMeta } = WitDriver;
 
 const callbackRoutes = t => {
     const notFunctions = routes.filter(r => typeof r[1] !== 'function');
@@ -64,11 +66,27 @@ const interactionHowAreYouWit = async t => {
     ));
 };
 
+const knowCitiesWithSlug = async t => {
+    const expressions = bugs.shouldHaveMeta;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => {
+        const origin = getEntity(outcome, 'origin');
+        const originMeta = getEntityMeta(origin);
+        const destination = getEntity(outcome, 'destination');
+        const destinationMeta = getEntityMeta(destination);
+        const place = getEntity(outcome, 'places');
+        const placeMeta = getEntityMeta(place);
+        const cityMeta = originMeta || destinationMeta || placeMeta;
+        t.truthy(cityMeta, JSON.stringify(outcome));
+    });
+};
+
 export {
     callbackRoutes,
     interactionLaugh,
     interactionLaughWit,
     interactionComplimentWit,
     interactionNameOriginWit,
-    interactionHowAreYouWit
+    interactionHowAreYouWit,
+    knowCitiesWithSlug
 };

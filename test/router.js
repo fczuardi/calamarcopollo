@@ -22,7 +22,8 @@ import {
     interactionLaughWit,
     interactionComplimentWit,
     interactionNameOriginWit,
-    interactionHowAreYouWit
+    interactionHowAreYouWit,
+    knowCitiesWithSlug
 } from './helpers/releases/v0.8.0';
 
 const store = createStore();
@@ -133,3 +134,4 @@ test('[0.8.0] interaction laugh with wit', interactionLaughWit);
 test('[0.8.0] interaction compliment with wit', interactionComplimentWit);
 test('[0.8.0] interaction name origin with wit', interactionNameOriginWit);
 test('[0.8.0] interaction how are you with wit', interactionHowAreYouWit);
+test('[0.8.0] cities with dupe entity and no meta', knowCitiesWithSlug);

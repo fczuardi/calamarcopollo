@@ -38,6 +38,28 @@ const interaction = {
     ]
 };
 
+const bugs = {
+    shouldHaveMeta: [
+        'belo horizonte',
+        'para belo horizonte',
+        'de belo horizonte',
+        'bh',
+        'sao carlos',
+        'para sao carlos',
+        'de sao carlos',
+        'sanca',
+        'sao paulo',
+        'para sao paulo',
+        'de sao paulo',
+        'sampa',
+        'campinas',
+        'para campinas',
+        'de campinas',
+        'cps',
+    ]
+};
+
 export {
-    interaction
+    interaction,
+    bugs
 };
