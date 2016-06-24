@@ -9,6 +9,16 @@ const interaction = {
         'jajajaja',
         'rsrs',
         'kkkkkkkkkkkk'
+    ],
+    compliment: [
+        'você é lindo',
+        'você é bem esperto!',
+        'que dahora! parabéns',
+        'cara, você é muito maneiro',
+        'parabéns rapaz, gostei',
+        'seu lindo',
+        'muito legal',
+        'como vc é bacana!'
     ]
 };
 

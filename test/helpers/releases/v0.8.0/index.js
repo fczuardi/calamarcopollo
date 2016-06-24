@@ -28,7 +28,7 @@ const getOutcome = async q => {
     return witResult.outcomes[0];
 };
 
-const interactionLaughtWit = async t => {
+const interactionLaughWit = async t => {
     const expressions = interaction.laugh;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
@@ -37,8 +37,18 @@ const interactionLaughtWit = async t => {
     ));
 };
 
+const interactionComplimenttWit = async t => {
+    const expressions = interaction.compliment;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.compliment(),
+        `Expression: ${expressions[i]}`
+    ));
+};
+
 export {
     callbackRoutes,
     interactionLaugh,
-    interactionLaughtWit
+    interactionLaughWit,
+    interactionComplimenttWit
 };
