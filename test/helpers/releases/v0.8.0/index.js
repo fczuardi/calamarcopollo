@@ -37,7 +37,7 @@ const interactionLaughWit = async t => {
     ));
 };
 
-const interactionComplimenttWit = async t => {
+const interactionComplimentWit = async t => {
     const expressions = interaction.compliment;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
@@ -46,9 +46,29 @@ const interactionComplimenttWit = async t => {
     ));
 };
 
+const interactionNameOriginWit = async t => {
+    const expressions = interaction.nameOrigin;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.nameOrigin(),
+        `Expression: ${expressions[i]}`
+    ));
+};
+
+const interactionHowAreYouWit = async t => {
+    const expressions = interaction.howAreYou;
+    const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    return outcomes.forEach((outcome, i) => t.is(
+        router(outcome), replies.howAreYou(),
+        `Expression: ${expressions[i]}`
+    ));
+};
+
 export {
     callbackRoutes,
     interactionLaugh,
     interactionLaughWit,
-    interactionComplimenttWit
+    interactionComplimentWit,
+    interactionNameOriginWit,
+    interactionHowAreYouWit
 };
