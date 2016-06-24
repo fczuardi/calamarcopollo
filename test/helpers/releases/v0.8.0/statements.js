@@ -56,6 +56,10 @@ const bugs = {
         'para campinas',
         'de campinas',
         'cps',
+        'barra funda',
+        'da barra funda',
+        'para barra funda',
+        'para o terminal barra funda'
     ]
 };
 

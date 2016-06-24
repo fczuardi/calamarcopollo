@@ -3,6 +3,10 @@ import { polloSanitize } from '../../../../src/stringHelpers';
 import router, { routes } from '../../../../src/router';
 import { replies } from '../../../../replies';
 import { interaction, bugs } from './statements';
+import { createStore } from '../../../../src/store';
+
+const store = createStore();
+
 
 const { getEntity, getEntityMeta } = WitDriver;
 
@@ -69,7 +73,7 @@ const interactionHowAreYouWit = async t => {
 const knowCitiesWithSlug = async t => {
     const expressions = bugs.shouldHaveMeta;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
-    return outcomes.forEach((outcome, i) => {
+    return outcomes.forEach(outcome => {
         const origin = getEntity(outcome, 'origin');
         const originMeta = getEntityMeta(origin);
         const destination = getEntity(outcome, 'destination');
@@ -77,8 +81,30 @@ const knowCitiesWithSlug = async t => {
         const place = getEntity(outcome, 'places');
         const placeMeta = getEntityMeta(place);
         const cityMeta = originMeta || destinationMeta || placeMeta;
-        t.truthy(cityMeta, JSON.stringify(outcome));
+        return t.truthy(cityMeta, JSON.stringify(outcome));
     });
+};
+
+const keepTimeFilterInContext = async t => {
+    const chatDate = Date.now();
+    const chatId = 12345080;
+    const context0 = {
+        id: chatId,
+        session: {},
+        date: chatDate
+    };
+    const outcome1 = await getOutcome('de sanca para sampa amanhã');
+    const outcome2 = await getOutcome('e para bauru?');
+    const reply1 = router(outcome1, { store, chat: context0 });
+    const context1 = store.getState().chats.find(chat => chat.id === chatId);
+    t.truthy(reply1.url);
+    t.truthy(context1.session.timeFilter.from.value);
+    const reply2 = router(outcome2, { store, chat: context1 });
+    const context2 = store.getState().chats.find(chat => chat.id === chatId);
+    t.truthy(reply2.url);
+    t.truthy(context2.session.timeFilter.from.value);
+    t.not(reply1, reply2);
+    t.is(context1.session.timeFilter.from.value, context2.session.timeFilter.from.value);
 };
 
 export {
@@ -88,5 +114,6 @@ export {
     interactionComplimentWit,
     interactionNameOriginWit,
     interactionHowAreYouWit,
-    knowCitiesWithSlug
+    knowCitiesWithSlug,
+    keepTimeFilterInContext
 };
