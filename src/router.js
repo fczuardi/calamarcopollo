@@ -23,10 +23,9 @@ const finalRoutes = [
     ...routes.slice(customRoutes.priority)
 ];
 
-console.log(finalRoutes.length);
-
 const router = createRouter(finalRoutes);
+
 export default router;
-export {
+exports = {
     routes
 };
