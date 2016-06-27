@@ -93,6 +93,12 @@ const tripDialogReply = context => {
     if (!hasOrigin && !hasDestination) {
         return replies.trip.noPlaces();
     }
+    if (hasOrigin && !originMeta) {
+        return replies.trip.noSlug(origin);
+    }
+    if (hasDestination && !destinationMeta) {
+        return replies.trip.noSlug(destination);
+    }
     if (hasOrigin && !hasDestination) {
         return replies.trip.noDestination();
     }
@@ -103,12 +109,6 @@ const tripDialogReply = context => {
         ? moment(timeFilter.from.value) : moment();
     const departureDay = day.format('YYYY-MM-DD');
     if (hasDestination && hasOrigin && !hasTrips) {
-        if (!originMeta) {
-            return replies.trip.noSlug(origin);
-        }
-        if (!destinationMeta) {
-            return replies.trip.noSlug(destination);
-        }
         const from = originMeta.slugs[0];
         const to = destinationMeta.slugs[0];
         const url = `${CLICKBUS_URL}/trips?from=${from}&to=${to}&departure=${departureDay}`;

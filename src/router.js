@@ -27,3 +27,6 @@ console.log(finalRoutes.length);
 
 const router = createRouter(finalRoutes);
 export default router;
+export {
+    routes
+};

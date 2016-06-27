@@ -36,6 +36,8 @@ const polloSanitize = text => latinize(text)
     .replace(/^@[^ ]* /, '')
     // @HACK wit has trouble with janeiro
     .replace(/rio de janeiro/, 'riodejaneiro')
+    // @HACK wit has trouble with sao carlos
+    .replace(/sao carlos/, 'sanca')
 ;
 
 export { dayString, polloSanitize, durationFormat };
