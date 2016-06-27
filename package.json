@@ -12,6 +12,7 @@
   "scripts": {
     "start": "dist/npm/src/index.js",
     "start:dev": "babel-node src/index.js",
+    "lint": "eslint src tasks replies test || true",
     "test": "ava --require babel-register",
     "test:watch": "ava --verbose --watch --require babel-register",
     "test:watch:nockoff": "NOCK_OFF=true npm run test:watch",
@@ -57,6 +58,7 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "docco": "^0.7.0",
+    "eslint": "^2.13.1",
     "eslint-config-calamar": "^2.1.1",
     "gh-pages": "^0.11.0",
     "shelljs": "^0.7.0"
