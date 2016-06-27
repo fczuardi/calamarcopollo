@@ -7,9 +7,9 @@ import insultRoutes from './routes/insult';
 
 const routes = [
     ...faqRoutes,
+    ...tripRoutes,
     ...commandRoutes,
     ...interactionRoutes,
-    ...tripRoutes,
     ...insultRoutes
 ];
 
