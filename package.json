@@ -19,6 +19,8 @@
     "doc": "docco -l linear test/helpers/releases/v0.3.0/statements.js",
     "publish:doc": "./tasks/insert-version.js && gh-pages -d docs",
     "cp:npm": "cp README.md .env-sample package.json LICENSE dist/npm/. && cp answers-sample.json dist/npm/answers.json",
+    "clean:npm": "rm -rf dist/npm",
+    "prebuild:npm": "npm run clean:npm",
     "build:npm": "babel -d dist/npm/src -D src && babel -d dist/npm/replies -D replies",
     "postbuild:npm": "npm run cp:npm",
     "prepublish:npm": "npm run build:npm",
@@ -66,6 +68,7 @@
   "dependencies": {
     "calamars": "^0.12.13",
     "fake-clickbus-api": "^0.1.31",
+    "fuse.js": "^2.2.0",
     "google-url": "0.0.4",
     "latinize": "^0.2.0",
     "moment": "^2.13.0",

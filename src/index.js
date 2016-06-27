@@ -64,8 +64,8 @@ const onUpdate = async ({ bot, update }) => {
     /* eslint-disable no-underscore-dangle */
     const { _text, outcomes } = witResult;
     const outcome = outcomes[0]
-    ? { text: _text, entities: outcomes[0].entities }
-    : {};
+        ? { text: _text, entities: outcomes[0].entities }
+        : {};
     /* eslint-enable no-underscore-dangle */
     console.log('outcome', JSON.stringify(outcome));
     console.log('chat, from, date', chat, from, date);

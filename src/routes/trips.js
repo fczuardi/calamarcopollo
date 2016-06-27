@@ -1,34 +1,10 @@
 import { updateChatSession } from '../actionCreators';
 import { tripDialogReply } from '../tripDialog';
+import { extractEntities } from '../fuzzy';
 import { WitDriver } from 'calamars';
-const { getEntity, getEntities, getEntityValue, getEntityMeta } = WitDriver;
+const { getEntityValue, getEntityMeta } = WitDriver;
 
 const placesConfidenceThreshold = 0.7;
-
-const extractEntities = outcomes => {
-    const unknownPlace = getEntity(outcomes, 'places');
-    const unknownPlaces = getEntities(outcomes, 'places');
-    const origin = getEntity(outcomes, 'origin');
-    const origins = getEntities(outcomes, 'origin');
-    const originMeta = getEntityMeta(origin);
-    const destination = getEntity(outcomes, 'destination');
-    const destinationMeta = getEntityMeta(destination);
-    const dateTime = getEntity(outcomes, 'datetime');
-    const timeFilter = dateTime ? {
-        from: !dateTime.from ? dateTime : dateTime.from,
-        to: dateTime.to ? dateTime.to : null
-    } : null;
-    return {
-        unknownPlace,
-        unknownPlaces,
-        origin,
-        origins,
-        originMeta,
-        destination,
-        destinationMeta,
-        timeFilter
-    };
-};
 
 const routes = [[
     outcomes => getEntityValue(outcomes, 'trip') === 'info',
