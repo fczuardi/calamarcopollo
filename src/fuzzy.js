@@ -16,6 +16,7 @@ const addLocalMetadata = place => {
     const needle = place.value;
     const searchResult = fuse.search(needle);
     if (searchResult.length) {
+        console.log('\nLocal metadata found.');
         const newPlace = {
             ...place,
             metadata: `{"slugs": ["${searchResult[0].slug}"]}`,
