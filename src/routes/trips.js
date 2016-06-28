@@ -100,26 +100,30 @@ const routes = [[
         if (timeFilter) {
             nextContext.timeFilter = timeFilter;
         }
-        if (destination) {
-            nextContext.destination = destination.value;
-            nextContext.destinationMeta = getEntityMeta(destination);
-        }
         if (origin) {
             nextContext.origin = origin.value;
             nextContext.originMeta = getEntityMeta(origin);
+        } else {
+            if (unknownPlace && destination) {
+                nextContext.origin = unknownPlace.value;
+                nextContext.originMeta = getEntityMeta(unknownPlace);
+            }
+            if (nextContext.destination && !nextContext.origin && place) {
+                nextContext.origin = place.value;
+                nextContext.originMeta = placeMeta;
+            }
         }
-        if (unknownPlace && destination) {
-            console.log('[issue #24] has places with no role and destination');
-            nextContext.origin = unknownPlace.value;
-            nextContext.originMeta = getEntityMeta(unknownPlace);
-        }
-        if (nextContext.destination && !nextContext.origin && place) {
-            nextContext.origin = place.value;
-            nextContext.originMeta = placeMeta;
-        }
-        if (!nextContext.destination) {
-            nextContext.destination = place.value;
-            nextContext.destinationMeta = placeMeta;
+        if (destination) {
+            nextContext.destination = destination.value;
+            nextContext.destinationMeta = getEntityMeta(destination);
+        } else {
+            if (
+                (!nextContext.destination && nextContext.origin) ||
+                (!nextContext.destination && !nextContext.origin && !origin && !destination)
+            ) {
+                nextContext.destination = place.value;
+                nextContext.destinationMeta = placeMeta;
+            }
         }
         if (store) {
             store.dispatch(updateChatSession({
