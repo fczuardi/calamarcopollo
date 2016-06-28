@@ -116,7 +116,8 @@ const routes = [[
         if (nextContext.destination && !nextContext.origin && place) {
             nextContext.origin = place.value;
             nextContext.originMeta = placeMeta;
-        } else {
+        }
+        if (!nextContext.destination) {
             nextContext.destination = place.value;
             nextContext.destinationMeta = placeMeta;
         }

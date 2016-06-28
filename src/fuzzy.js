@@ -36,10 +36,10 @@ const addLocalMetadatas = arr => {
 };
 
 const extractEntities = outcomes => {
-    const unknownPlace = addLocalMetadata(getEntity(outcomes, 'places'));
     const unknownPlaces = addLocalMetadatas(getEntities(outcomes, 'places'));
-    const origin = addLocalMetadata(getEntity(outcomes, 'origin'));
+    const unknownPlace = unknownPlaces && unknownPlaces.length ? unknownPlaces[0] : null;
     const origins = addLocalMetadatas(getEntities(outcomes, 'origin'));
+    const origin = origins && origins.length ? origins[0] : null;
     const destination = addLocalMetadata(getEntity(outcomes, 'destination'));
     const originMeta = getEntityMeta(origin);
     const destinationMeta = getEntityMeta(destination);
@@ -49,7 +49,7 @@ const extractEntities = outcomes => {
         to: dateTime.to ? dateTime.to : null
     } : null;
 
-    return {
+    const result = {
         unknownPlace,
         unknownPlaces,
         origin,
@@ -59,6 +59,8 @@ const extractEntities = outcomes => {
         destinationMeta,
         timeFilter
     };
+    // console.log('result', result);
+    return result;
 };
 
 export {
