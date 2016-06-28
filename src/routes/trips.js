@@ -94,35 +94,41 @@ const routes = [[
             destination,
             timeFilter
         } = extractEntities(outcomes);
-        const place = unknownPlace || origin || destination;
-        const placeMeta = getEntityMeta(place);
+        const unknownPlaceMeta = getEntityMeta(unknownPlace);
         let nextContext = Object.assign({}, context);
         if (timeFilter) {
             nextContext.timeFilter = timeFilter;
         }
         if (origin) {
+            // console.log('1 origin', origin);
             nextContext.origin = origin.value;
             nextContext.originMeta = getEntityMeta(origin);
         } else {
+            // console.log('2 not origin', destination, unknownPlace);
             if (unknownPlace && destination) {
+                // console.log('3 not origin, destination and unknowPlace');
                 nextContext.origin = unknownPlace.value;
-                nextContext.originMeta = getEntityMeta(unknownPlace);
+                nextContext.originMeta = unknownPlaceMeta;
             }
-            if (nextContext.destination && !nextContext.origin && place) {
-                nextContext.origin = place.value;
-                nextContext.originMeta = placeMeta;
+            if (unknownPlace && context.destination && !context.origin) {
+                // console.log('4 not origin, unknowPlace and the context has only destination');
+                nextContext.origin = unknownPlace.value;
+                nextContext.originMeta = unknownPlaceMeta;
             }
         }
         if (destination) {
+            // console.log('5 destination', destination);
             nextContext.destination = destination.value;
             nextContext.destinationMeta = getEntityMeta(destination);
         } else {
+            // console.log('6 not destination, unknowPlace and the context has only destination');
             if (
-                (!context.destination && context.origin) ||
-                (!context.destination && !context.origin && !origin && !destination)
+                (unknownPlace && !context.destination && context.origin) ||
+                (unknownPlace && !context.destination && !context.origin && !origin)
             ) {
-                nextContext.destination = place.value;
-                nextContext.destinationMeta = placeMeta;
+                // console.log('7 not dest, unknowPlace and the context has nothing or only origin');
+                nextContext.destination = unknownPlace.value;
+                nextContext.destinationMeta = unknownPlaceMeta;
             }
         }
         if (store) {
