@@ -13,7 +13,18 @@ const routes = [
     ...insultRoutes
 ];
 
-const router = createRouter(routes);
+const customRoutesPath = process.env.CUSTOM_ROUTES_PATH || './routes/customRoutes';
+
+const customRoutes = require(customRoutesPath);
+
+const finalRoutes = [
+    ...routes.slice(0, customRoutes.priority),
+    ...customRoutes.routes,
+    ...routes.slice(customRoutes.priority)
+];
+
+const router = createRouter(finalRoutes);
+
 export default router;
 export {
     routes
