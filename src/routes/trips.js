@@ -118,8 +118,8 @@ const routes = [[
             nextContext.destinationMeta = getEntityMeta(destination);
         } else {
             if (
-                (!nextContext.destination && nextContext.origin) ||
-                (!nextContext.destination && !nextContext.origin && !origin && !destination)
+                (!context.destination && context.origin) ||
+                (!context.destination && !context.origin && !origin && !destination)
             ) {
                 nextContext.destination = place.value;
                 nextContext.destinationMeta = placeMeta;
