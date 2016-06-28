@@ -13,7 +13,7 @@ const routes = [
     ...insultRoutes
 ];
 
-const customRoutesPath = process.env.CUSTOM_ROUTES_PATH || './routes/customRoutes';
+const customRoutesPath = process.env.CUSTOM_ROUTES_PATH || './routes/custom';
 
 const customRoutes = require(customRoutesPath);
 
