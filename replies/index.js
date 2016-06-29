@@ -26,7 +26,7 @@ const defaultReplies = {
     ),
     restart: () => 'OK, vamos recomeçar do zero.',
     // ## Insult
-    insult: () => 'Eu sou um robô e meu trabalho é servir, faço o possível mas nem sempre acerto… pode extravazar seu descontentamento em mim, eu mereço.',
+    insult: username => `Desculpe ${username}, sou um robô e meu trabalho é servir, faço o possível mas nem sempre acerto… pode extravazar seu descontentamento em mim, eu mereço.`,
     // ## Interactions
     greeting: {
         noUsername: () => 'Oi, em que posso ajudar?',
