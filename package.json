@@ -18,7 +18,7 @@
     "test:watch:nockoff": "NOCK_OFF=true npm run test:watch",
     "doc": "docco -l linear test/helpers/releases/v0.3.0/statements.js",
     "publish:doc": "./tasks/insert-version.js && gh-pages -d docs",
-    "cp:npm": "cp README.md .env-sample package.json LICENSE dist/npm/. && cp answers-sample.json dist/npm/answers.json && mkdir dist/npm/bin && cp tasks/get-places.sh tasks/local-slug-db.sh dist/npm/bin",
+    "cp:npm": "cp README.md .env-sample package.json LICENSE AUTHORS dist/npm/. && cp answers-sample.json dist/npm/answers.json && mkdir dist/npm/bin && cp tasks/get-places.sh tasks/local-slug-db.sh dist/npm/bin",
     "clean:npm": "rm -rf dist/npm",
     "prebuild:npm": "npm run clean:npm",
     "build:npm": "babel -d dist/npm/src -D src && babel -d dist/npm/replies -D replies",
