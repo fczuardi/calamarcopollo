@@ -4,9 +4,6 @@ import {
     UPDATE_CHAT_SESSION
 } from './actionTypes';
 
-import { WitDriver } from 'calamars';
-const { getEntityValue } = WitDriver;
-
 const expireSessionTime = 3 * 60 * 1000; // 3 minutes
 
 const updateArrayItem = (arr, i, newItem) => {
