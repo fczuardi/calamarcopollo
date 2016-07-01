@@ -9,6 +9,11 @@
     <form id="postData" method="POST"></form>
 </body>
 <script>
+var ua = window.navigator.userAgent;
+var isClickBusMobile = new RegExp(/android|iphone|IEMobile|blackberry/i).test(window.navigator.userAgent);
+if (isClickBusMobile) {
+	window.location.href = failUrl;
+}
 var queryString = document.location.search.replace('?', '');
 var defaultFailUrl = 'https://github.com/fczuardi/calamarcopollo';
 var failUrl = queryString.indexOf('failUrl=') !== -1
