@@ -1,7 +1,9 @@
 import moment from 'moment';
 import { replies } from '../replies';
+import latinize from 'latinize';
 
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
+const CLICKBUS_SVG_LOGO_URL = process.env.CLICKBUS_SVG_LOGO_URL || 'https://m.clickbus.com.br/app/public/img/buslines/br/';
 
 const tripListSizeThreshold = 10;
 
@@ -20,6 +22,8 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
             duration,
             scheduleId
         } = trip;
+        const busCompanyLogoName = latinize(busCompanyName).replace(/ |%20/ig, '-').toLowerCase();
+        const busCompanyLogo = `${CLICKBUS_SVG_LOGO_URL}${busCompanyLogoName}.svg`;
         const departure = {
             time: moment(departureTime).format('DD/MM HH:mm'),
             name: departurePlace
@@ -58,7 +62,7 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
         const url = `${baseURL}?body=${JSON.stringify(postBody)}&url=${postURL}&session=${session}&failUrl=${failUrl}`;
         return {
             title,
-            // image_url: busCompanyLogo,
+            image_url: busCompanyLogo,
             buttons: [{
                 type: 'web_url',
                 url,
