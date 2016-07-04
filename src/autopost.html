@@ -11,14 +11,14 @@
 <script>
 var ua = window.navigator.userAgent;
 var isClickBusMobile = new RegExp(/android|iphone|IEMobile|blackberry/i).test(window.navigator.userAgent);
-if (isClickBusMobile) {
-	window.location.href = failUrl;
-}
 var queryString = document.location.search.replace('?', '');
 var defaultFailUrl = 'https://github.com/fczuardi/calamarcopollo';
 var failUrl = queryString.indexOf('failUrl=') !== -1
-    ? decodeURIComponent(queryString.replace(/.*failUrl=/, '')) || defaultFailUrl
-    : defaultFailUrl;
+? decodeURIComponent(queryString.replace(/.*failUrl=/, '')) || defaultFailUrl
+: defaultFailUrl;
+if (isClickBusMobile) {
+	window.location.href = failUrl;
+} else {
 try {
     var searchParams = new URLSearchParams(queryString);
     var formElement = document.getElementById('postData');
@@ -78,6 +78,8 @@ try {
     console.log(e);
     console.log(failUrl);
     window.location.href = failUrl;
+}
+
 }
 </script>
 </html>
