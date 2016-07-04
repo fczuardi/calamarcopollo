@@ -1,9 +1,14 @@
 import { replies } from '../../replies';
+import { updateChatSession } from '../actionCreators';
 import { WitDriver } from 'calamars';
+
 const { getEntityValue } = WitDriver;
 const routes = [[
     outcomes => getEntityValue(outcomes, 'interaction') === 'close',
-    replies.close
+    (outcomes, { store, chat, date }) => {
+        store.dispatch(updateChatSession({ date, chat: { ...chat, session: {} } }));
+        return replies.close();
+    }
 ], [
     outcomes => (
         getEntityValue(outcomes, 'interaction') === 'laugh' ||

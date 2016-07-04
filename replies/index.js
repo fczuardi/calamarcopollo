@@ -78,7 +78,7 @@ const defaultReplies = {
             body: `${options ? `:\n\n${options}` : '.'}`,
             footer: `Para reservar acesse ${url}`
         }),
-        detail: () => 'Checar'
+        detail: () => 'Escolher'
     },
     // ## Unexpected answer
     unknown: () => (DEBUG_TO_LOGFILE
