@@ -19,6 +19,9 @@ const routes = [[
     outcomes => getEntityValue(outcomes, 'interaction') === 'compliment',
     replies.compliment
 ], [
+    outcomes => getEntityValue(outcomes, 'interaction') === 'thanks',
+    replies.thanks  
+], [
     outcomes => getEntityValue(outcomes, 'interaction') === 'nameOrigin',
     replies.nameOrigin
 ], [

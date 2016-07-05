@@ -37,6 +37,7 @@ const defaultReplies = {
     compliment: () => 'Muito obrigado!',
     nameOrigin: () => 'Por que a galinha atravessou a rua? :P',
     howAreYou: () => 'Vou bem, obrigado!',
+    thanks: () => 'Não há de que :)',
     // ## FAQ
     faq: faqReply,
     // ## Trip
