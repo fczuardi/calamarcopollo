@@ -4,6 +4,7 @@ import latinize from 'latinize';
 
 const CLICKBUS_URL = process.env.CLICKBUS_URL;
 const CLICKBUS_SVG_LOGO_URL = process.env.CLICKBUS_SVG_LOGO_URL || 'https://m.clickbus.com.br/app/public/img/buslines/br/';
+const MORE_RESULTS_IMAGE_URL = process.env.MORE_RESULTS_IMAGE_URL;
 
 const tripListSizeThreshold = 10;
 
@@ -77,6 +78,7 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
 const buildLastFacebookElement = url => (
     {
         title: replies.trip.moreResultsTitle(),
+        image_url: MORE_RESULTS_IMAGE_URL,
         buttons: [{
             type: 'web_url',
             url,
