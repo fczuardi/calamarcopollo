@@ -71,8 +71,19 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
             subtitle
         };
     });
-    return result.slice(0, 10);
+    return result.slice(0, 9).concat(buildLastFacebookElement(searchUrl));
 };
+
+const buildLastFacebookElement = url => (
+    {
+        title: replies.trip.moreResultsTitle(),
+        buttons: [{
+            type: 'web_url',
+            url,
+            title: replies.trip.moreResultsButton()
+        }]
+    }
+);
 
 const tripDialogReply = context => {
     const {

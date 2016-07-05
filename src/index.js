@@ -219,11 +219,6 @@ const onUpdate = async ({ bot, update }) => {
                             elements: secondReply.structuredRely.slice(0, 10)
                         }
                     }
-                }).then(() => {
-                    bot.sendMessage({
-                        ...sendMessageOptions,
-                        text: secondReply.textReply.footer
-                    });
                 });
             });
         }

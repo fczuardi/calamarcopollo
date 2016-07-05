@@ -79,6 +79,8 @@ const defaultReplies = {
             body: `${options ? `:\n\n${options}` : '.'}`,
             footer: `Para reservar acesse ${url}`
         }),
+        moreResultsTitle: () => 'Mais opções',
+        moreResultsButton: () => 'Ver todas',
         detail: () => 'Escolher'
     },
     // ## Unexpected answer
