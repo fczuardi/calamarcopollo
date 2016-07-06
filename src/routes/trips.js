@@ -28,11 +28,10 @@ const routes = [[
         } = checkConfidences({
             origin, destination, unknownPlace
         });
-        return hasTripIntent && (
-            hasDestination ||
-            hasOrigin ||
-            hasUnknownPlace
-        );
+        return hasTripIntent
+            || hasDestination
+            || hasOrigin
+            || hasUnknownPlace;
     },
     (outcomes, { store, chat } = {}) => {
         const {
