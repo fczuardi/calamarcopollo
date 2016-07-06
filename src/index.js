@@ -12,6 +12,7 @@ import {
 import wit from './wit';
 import router from './router';
 import { replies } from '../replies';
+import { menu } from '../menu';
 import moment from 'moment';
 import request from 'request-promise';
 import GoogleURL from 'google-url';
@@ -256,9 +257,22 @@ const onUpdate = async ({ bot, update }) => {
     });
 };
 
+const onPostback = ({ update, bot }) => {
+    const postbackPayload = update.postback.payload;
+    return onUpdate({
+        bot,
+        update: {
+            ...update,
+            message: {
+                text: postbackPayload
+            }
+        }
+    });
+};
+
 const port = process.env.PORT;
 const callbackPath = process.env.FB_CALLBACK_PATH;
-const listeners = { onUpdate };
+const listeners = { onUpdate, onPostback };
 const staticFiles = [
     { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: `${POLLO_PATH}/src/autopost.html` }
 ];
@@ -269,11 +283,20 @@ console.log(moment().format());
 //
 fbBot.launchPromise.then(serverStatus => {
     console.log('serverStatus', serverStatus, port);
+
+    // Get Started button reply
     fbBot.setWelcomeMessage({
         text: replies.start()
     }).then(welcomeMsgSetResult =>
         console.log('welcomeMsgSetResult', welcomeMsgSetResult)
     );
+
+    // Persistent Menu
+    fbBot.setThreadSettings({
+        type: 'call_to_actions',
+        state: 'existing_thread',
+        cta: menu
+    });
 });
 
 tgBot.on('update', update => onUpdate({ bot: tgBot, update }));
