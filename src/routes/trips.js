@@ -4,10 +4,36 @@ import { extractEntities } from '../fuzzy';
 import { WitDriver } from 'calamars';
 const { getEntityValue, getEntityMeta } = WitDriver;
 
-const placesConfidenceThreshold = 0.7;
+const placesConfidenceThreshold = 0.77;
+
+const checkConfidences = ({
+    origin,
+    destination,
+    unknownPlace
+}) => {
+    const hasDestination = (destination && destination.confidence >= placesConfidenceThreshold);
+    const hasOrigin = (origin && origin.confidence >= placesConfidenceThreshold);
+    const hasUnknownPlace = (
+        unknownPlace && unknownPlace.confidence >= placesConfidenceThreshold
+    );
+    return { hasDestination, hasOrigin, hasUnknownPlace };
+};
 
 const routes = [[
-    outcomes => getEntityValue(outcomes, 'trip') === 'info',
+    outcomes => {
+        const hasTripIntent = getEntityValue(outcomes, 'trip') === 'info';
+        const { origin, destination, unknownPlace } = extractEntities(outcomes);
+        const {
+            hasDestination, hasOrigin, hasUnknownPlace
+        } = checkConfidences({
+            origin, destination, unknownPlace
+        });
+        return hasTripIntent && (
+            hasDestination ||
+            hasOrigin ||
+            hasUnknownPlace
+        );
+    },
     (outcomes, { store, chat } = {}) => {
         const {
             origin,
@@ -77,11 +103,16 @@ const routes = [[
             destination,
             timeFilter
         } = extractEntities(outcomes);
-        const place = unknownPlace || origin || destination;
+        const {
+            hasDestination, hasOrigin, hasUnknownPlace
+        } = checkConfidences({
+            origin, destination, unknownPlace
+        });
+
         const result = (
-            (origin && destination) ||
-            (unknownPlace && destination) ||
-            place ||
+            hasDestination ||
+            hasOrigin ||
+            hasUnknownPlace ||
             timeFilter
         );
         return result;
@@ -94,12 +125,17 @@ const routes = [[
             destination,
             timeFilter
         } = extractEntities(outcomes);
+        const {
+            hasDestination, hasOrigin, hasUnknownPlace
+        } = checkConfidences({
+            origin, destination, unknownPlace
+        });
         const unknownPlaceMeta = getEntityMeta(unknownPlace);
         let nextContext = Object.assign({}, context);
         if (timeFilter) {
             nextContext.timeFilter = timeFilter;
         }
-        if (origin) {
+        if (hasOrigin) {
             // console.log('1 origin', origin);
             if (!context.destination && context.origin) {
                 // console.log('2 origin with context missing destination', origin);
@@ -112,32 +148,33 @@ const routes = [[
             }
         } else {
             // console.log('4 not origin', destination, unknownPlace);
-            if (unknownPlace && destination) {
+            if (hasUnknownPlace && hasDestination) {
                 // console.log('5 not origin, destination and unknowPlace');
                 nextContext.origin = unknownPlace.value;
                 nextContext.originMeta = unknownPlaceMeta;
             }
-            if (unknownPlace && context.destination && !context.origin) {
+            if (hasUnknownPlace && context.destination && !context.origin) {
                 // console.log('6 not origin, unknowPlace and the context has only destination');
                 nextContext.origin = unknownPlace.value;
                 nextContext.originMeta = unknownPlaceMeta;
             }
         }
-        if (destination) {
-            // console.log('7 destination', destination);
+        if (hasDestination) {
+            // console.log('7 destination', destination, destination.confidence);
             nextContext.destination = destination.value;
             nextContext.destinationMeta = getEntityMeta(destination);
         } else {
             // console.log('8 not destination, unknowPlace and the context has only destination');
             if (
-                (unknownPlace && !context.destination && context.origin) ||
-                (unknownPlace && !context.destination && !context.origin && !origin)
+                (hasUnknownPlace && !context.destination && context.origin) ||
+                (hasUnknownPlace && !context.destination && !context.origin && !origin)
             ) {
                 // console.log('9 not dest, unknowPlace and the context has nothing or only origin');
                 nextContext.destination = unknownPlace.value;
                 nextContext.destinationMeta = unknownPlaceMeta;
             }
         }
+        // console.log('=====nextContext', nextContext);
         if (store) {
             store.dispatch(updateChatSession({
                 chat: { ...chat, session: nextContext }
