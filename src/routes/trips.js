@@ -136,7 +136,13 @@ const routes = [[
         }
         if (hasOrigin) {
             // console.log('1 origin', origin);
-            if (!context.destination && context.origin) {
+            if (hasUnknownPlace) {
+                // console.log('1.1 origin + place', origin, unknownPlace);
+                nextContext.origin = origin.value;
+                nextContext.originMeta = getEntityMeta(origin);
+                nextContext.destination = unknownPlace.value;
+                nextContext.destinationMeta = getEntityMeta(unknownPlace);
+            } else if (!context.destination && context.origin) {
                 // console.log('2 origin with context missing destination', origin);
                 nextContext.destination = origin.value;
                 nextContext.destinationMeta = getEntityMeta(origin);
