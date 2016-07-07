@@ -6,11 +6,7 @@ const { getEntityValue, getEntityMeta } = WitDriver;
 
 const placesConfidenceThreshold = 0.77;
 
-const checkConfidences = ({
-    origin,
-    destination,
-    unknownPlace
-}) => {
+const checkConfidences = ({ origin, destination, unknownPlace }) => {
     const hasDestination = (destination && destination.confidence >= placesConfidenceThreshold);
     const hasOrigin = (origin && origin.confidence >= placesConfidenceThreshold);
     const hasUnknownPlace = (
