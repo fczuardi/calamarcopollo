@@ -152,6 +152,7 @@ const onUpdate = async ({ bot, update }) => {
                 departure,
                 arrival,
                 busCompany,
+                bus,
                 availableSeats
             } = firstPart;
             const price = departure.waypoint.prices[0].price;
@@ -165,6 +166,8 @@ const onUpdate = async ({ bot, update }) => {
             const duration = arrivalTime.diff(departureTime, 'minutes');
             const busCompanyName = busCompany.name;
             const busCompanyLogo = busCompany.logo;
+            const busType = bus.serviceClass;
+            const busTypeId = bus.id;
             console.log(
 `${beginTime.date} ${beginTime.time} - ${endTime.date} ${endTime.time} - ${duration} - ${availableSeats}`
             );
@@ -177,6 +180,8 @@ const onUpdate = async ({ bot, update }) => {
                 duration,
                 busCompanyName,
                 busCompanyLogo,
+                busType,
+                busTypeId,
                 availableSeats,
                 scheduleId
             };

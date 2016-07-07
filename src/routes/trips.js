@@ -38,12 +38,20 @@ const routes = [[
             destinationMeta,
             unknownPlace,
             unknownPlaces,
-            timeFilter
+            timeFilter,
+            busTypeFilters,
+            priceFilter
         } = extractEntities(outcomes);
         const context = chat && chat.session ? chat.session : {};
         let nextContext = Object.assign({}, context);
         if (timeFilter) {
             nextContext.timeFilter = timeFilter;
+        }
+        if (busTypeFilters && busTypeFilters.length) {
+            nextContext.busTypeFilters = busTypeFilters;
+        }
+        if (priceFilter) {
+            nextContext.priceFilter = priceFilter;
         }
         if (destination && destination.confidence >= placesConfidenceThreshold) {
             nextContext.destination = destination.value;

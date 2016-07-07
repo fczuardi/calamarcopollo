@@ -48,6 +48,16 @@ const extractEntities = outcomes => {
         from: !dateTime.from ? dateTime : dateTime.from,
         to: dateTime.to ? dateTime.to : null
     } : null;
+    const filters = getEntities(outcomes, 'filter');
+    const busTypeFilters = filters ? filters.filter(entity => (
+        entity.value === 'leito' ||
+        entity.value === 'semi-leito' ||
+        entity.value === 'convencional')
+    ) : null;
+    const priceFilter = filters ? filters.find(entity => (
+        entity.value === 'maiorPreco' ||
+        entity.value === 'menorPreco')
+    ) || null : null;
 
     const result = {
         unknownPlace,
@@ -57,7 +67,9 @@ const extractEntities = outcomes => {
         originMeta,
         destination,
         destinationMeta,
-        timeFilter
+        timeFilter,
+        busTypeFilters,
+        priceFilter
     };
     // console.log('result', result);
     return result;

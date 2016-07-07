@@ -87,6 +87,12 @@ const buildLastFacebookElement = url => (
     }
 );
 
+const busTypeValueIds = {
+    'convencional': [1],
+    'semi-leito': [2, 3],
+    'leito': [4, 5, 6, 7, 8, 9]
+};
+
 const tripDialogReply = context => {
     const {
         origin,
@@ -94,6 +100,8 @@ const tripDialogReply = context => {
         destination,
         destinationMeta,
         timeFilter,
+        priceFilter,
+        busTypeFilters,
         apiError,
         trips,
         shortUrl,
@@ -104,6 +112,7 @@ const tripDialogReply = context => {
     const hasApiError = apiError !== undefined;
     const hasTrips = trips !== undefined;
     const hasNoTrips = hasTrips && !trips.length;
+    const hasBustypeFilters = busTypeFilters && busTypeFilters.length;
     if (hasApiError) {
         return replies.trip.apiError(apiError);
     }
@@ -141,9 +150,23 @@ const tripDialogReply = context => {
     if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
         return replies.trip.noTripsWithUrl(origin, destination, shortUrl);
     }
+
+    const filteredTripsByBusType = hasBustypeFilters ? trips.filter(trip => {
+        const busTypeId = parseInt(trip.busTypeId, 10);
+        // array flatten in js http://stackoverflow.com/a/10865042/2052311
+        const busTypeIds = [].concat.apply([],
+            busTypeFilters.map(busTypeEntity => busTypeValueIds[busTypeEntity.value])
+        );
+        const result = busTypeIds.indexOf(busTypeId) !== -1;
+        return result;
+    }) : trips;
+
+    console.log('filteredTripsByBusType.length', filteredTripsByBusType.length, trips.length);
+
     if (hasDestination && hasOrigin && hasTrips && timeFilter &&
                 timeFilter.from && timeFilter.from.grain !== 'day') {
-        const filteredTripsAfter = trips.filter(trip =>
+        // Filter trips after a day time
+        const filteredTripsAfter = filteredTripsByBusType.filter(trip =>
             trip.departureTime.isAfter(timeFilter.from.value)
         );
 
@@ -184,6 +207,7 @@ const tripDialogReply = context => {
                 structuredRely
             };
         }
+        // Filter trips after a day time and before another time
         const filteredTripsBetween = filteredTripsAfter.filter(trip =>
             trip.departureTime.isBefore(timeFilter.to.value)
         );
@@ -222,7 +246,7 @@ const tripDialogReply = context => {
             structuredRely
         };
     }
-    const tripList = trips.map(trip => {
+    const tripList = filteredTripsByBusType.map(trip => {
         const departure = {
             time: moment(trip.departureTime).format('DD/MM HH:mm'),
             name: trip.departurePlace
@@ -240,7 +264,7 @@ const tripDialogReply = context => {
         destinationMeta.slugs[0],
         sessionCookie,
         shortUrl,
-        trips
+        filteredTripsByBusType
     );
     // console.log('structuredRely', JSON.stringify(structuredRely));
     return {
@@ -248,9 +272,9 @@ const tripDialogReply = context => {
             origin,
             destination,
             departureDay,
-            trips.length,
+            filteredTripsByBusType.length,
             shortUrl,
-            trips.length < tripListSizeThreshold ? tripList : null
+            filteredTripsByBusType.length < tripListSizeThreshold ? tripList : null
         ),
         structuredRely
     };
