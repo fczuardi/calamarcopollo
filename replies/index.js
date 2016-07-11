@@ -45,12 +45,24 @@ const defaultReplies = {
         noPlaces: () => 'Certo… preciso saber da origem e do destino',
         noDestination: () => 'E qual o destino?',
         noOrigin: () => 'Saindo de onde?',
-        requesting: (origin, destination) =>
-            `Só um minuto, vou buscar aqui… (${origin} 🚌 ${destination})`,
-        requestingWithDay: (origin, destination, day) =>
-            `Só um minuto, vou buscar aqui… (${origin} 🚌 ${destination}, 🗓 ${day.format('DD/MM/YYYY')})`,
-        requestingWithDayAndTime: (origin, destination, day, to) =>
-            `Só um minuto, vou buscar aqui… (${origin} 🚌 ${destination}, 🗓 ${day.format('DD/MM/YYYY')} 🕙 ${day.format('HH:mm')}${to ? ` - ${to.format('HH:mm')}` : ''})`,
+        requestingWithFilters: (origin, destination, { timeFilterFrom, timeFilterTo, busTypeFilters }) => {
+            const begin = 'Só um minuto, vou buscar aqui… (';
+            const end = ')';
+            const places = `${origin} 🚌 ${destination}`;
+            const day = timeFilterFrom
+                ? `🗓 ${timeFilterFrom.format('DD/MM/YYYY')})`
+                : null;
+            const timeInterval = day
+                ? `🕙 ${timeFilterFrom.format('HH:mm')}${timeFilterTo ? ` - ${timeFilterTo.format('HH:mm')}` : ''})`
+                : null;
+            const busType = busTypeFilters
+                ? `😴 ${busTypeFilters.join(' ou ')}`
+                : null;
+            const content = [places, day, timeInterval, busType]
+                .filter(i => i !== null)
+                .join(', ');
+            return begin + content + end;
+        },
         noSlug: place =>
             `Infelizmente ${place} é uma localidade que eu não conheço.`,
         apiError: statusCode => `⛔️ Estou tendo problemas para acessar a base de viagens. Por favor tente mais tarde, ou entre em contato com o suporte. [${statusCode}]`,
@@ -64,21 +76,26 @@ const defaultReplies = {
             `${company}: ${departure.name} ${departure.time} 🚌  ${arrival.name} ${arrival.time}, ${duration} minutos ${seats} lugar${seats !== '1' ? 'es' : ''} disponíve${seats !== '1' ? 'is' : 'l'}.`,
         listItemFb: (company, departure, arrival, seats, duration) =>
             `${departure.name} ${departure.time} → ${arrival.name} ${arrival.time}, ${duration} minutos.`,
-        filteredDepartureListAfter: (origin, destination, day, optionsSize, url, options) => ({
-            header: `De ${origin} para ${destination} ${dayString(day, dayStrings)} depois das ${day.format('HH:mm')} tenho ${optionsSize} ${optionsSize !== 1 ? 'opções' : 'opção'}:`,
-            body: `${options ? `:\n\n${options}` : '.'}`,
-            footer: `Para ver todas as opções desse dia acesse ${url}`
-        }),
-        filteredDepartureListBetween: (origin, destination, from, to, optionsSize, url, options) => ({
-            header: `De ${origin} para ${destination} ${dayString(from, dayStrings)} entre ${from.format('HH:mm')} e ${to.format('HH:mm')} tenho ${optionsSize} ${optionsSize !== 1 ? 'opções' : 'opção'}:`,
-            body: `${options ? `:\n\n${options}` : '.'}`,
-            footer: `Para ver todas as opções desse dia acesse ${url}`
-        }),
-        departureList: (origin, destination, day, optionsSize, url, options) => ({
-            header: `De ${origin} para ${destination} ${dayString(day, dayStrings)} tenho ${optionsSize} opç${optionsSize !== 1 ? 'ões' : 'ão'}:`,
-            body: `${options ? `:\n\n${options}` : '.'}`,
-            footer: `Para reservar acesse ${url}`
-        }),
+        filteredDepartureList: (origin, destination, results, url,
+            { timeFilterFrom, timeFilterTo, busTypeFilters }) => {
+            const optionsSize = results ? results.length : 0;
+            const day = dayString(timeFilterFrom, dayStrings);
+            const headerBegin = `De ${origin} para ${destination} ${day}, `;
+            const headerEnd = `tenho ${optionsSize} opç${optionsSize === 1 ? 'ão' : 'ões'}`;
+            const intervalFilterAfter = timeFilterFrom
+                ? `depois das ${timeFilterFrom.format('HH:mm')}, `
+                : '';
+            const intervalFilter = timeFilterTo
+                    ? `entre ${timeFilterFrom.format('HH:mm')} e ${timeFilterTo.format('HH:mm')}, `
+                    : intervalFilterAfter;
+            const busType = busTypeFilters
+                ? `😴 ${busTypeFilters.join(' ou ')}, `
+                : '';
+            const header = `${headerBegin}${intervalFilter}${busType}${headerEnd}`;
+            const body = `${results ? `:\n\n${results}` : '.'}`;
+            const footer = `Para ver todas as opções desse dia acesse ${url}`;
+            return { header, body, footer };
+        },
         moreResultsTitle: () => 'Mais opções',
         moreResultsButton: () => 'Ver todas',
         detail: () => 'Escolher'

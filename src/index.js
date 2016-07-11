@@ -97,17 +97,29 @@ const onUpdate = async ({ bot, update }) => {
         return reply;
     }
     if (reply && reply.url) {
-        const replyText = !context.timeFilter
-            ? replies.trip.requesting(context.origin, context.destination)
-            : context.timeFilter.from.grain === 'day'
-                ? replies.trip.requestingWithDay(
-                    context.origin, context.destination,
-                    moment(context.timeFilter.from.value)
-                ) : replies.trip.requestingWithDayAndTime(
-                    context.origin, context.destination,
-                    moment(context.timeFilter.from.value),
-                    context.timeFilter.to ? moment(context.timeFilter.to.value) : null
-                );
+        const timeFilterFrom = context.timeFilter && context.timeFilter.from
+            ? moment(context.timeFilter.from.value)
+            : null;
+        const timeFilterTo = context.timeFilter && context.timeFilter.to
+            ? moment(context.timeFilter.to.value)
+            : null;
+        const hasBustypeFilters = context.busTypeFilters && context.busTypeFilters.length;
+        const busTypeFilters = hasBustypeFilters
+            ? context.busTypeFilters.reduce((prev, curr) => (
+                prev.indexOf(curr.value) === -1
+                    ? prev.concat(curr.value)
+                    : prev
+            ), []) : null;
+        console.log('busTypeFilters', busTypeFilters);
+        const replyText = replies.trip.requestingWithFilters(
+            context.origin,
+            context.destination,
+            {
+                timeFilterFrom,
+                timeFilterTo,
+                busTypeFilters
+            }
+        );
         bot.sendMessage({
             ...sendMessageOptions,
             text: replyText

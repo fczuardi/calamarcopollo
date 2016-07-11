@@ -6,8 +6,6 @@ const CLICKBUS_URL = process.env.CLICKBUS_URL;
 const CLICKBUS_SVG_LOGO_URL = process.env.CLICKBUS_SVG_LOGO_URL || 'https://m.clickbus.com.br/app/public/img/buslines/br/';
 const MORE_RESULTS_IMAGE_URL = process.env.MORE_RESULTS_IMAGE_URL;
 
-const tripListSizeThreshold = 10;
-
 const buildFacebookElements = (origin, destination, session, searchUrl, trips) => {
     console.log('buildFacebookElements');
     const result = trips.map(trip => {
@@ -107,6 +105,7 @@ const tripDialogReply = context => {
         shortUrl,
         sessionCookie
     } = context;
+    // console.log('tripDialogReply context', context);
     const hasOrigin = origin !== undefined;
     const hasDestination = destination !== undefined;
     const hasApiError = apiError !== undefined;
@@ -114,21 +113,27 @@ const tripDialogReply = context => {
     const hasNoTrips = hasTrips && !trips.length;
     const hasBustypeFilters = busTypeFilters && busTypeFilters.length;
     if (hasApiError) {
+        // console.log('hasApiError, return', apiError);
         return replies.trip.apiError(apiError);
     }
     if (!hasOrigin && !hasDestination) {
+        // console.log('no places, return');
         return replies.trip.noPlaces();
     }
     if (hasOrigin && !originMeta) {
+        // console.log('no slug (origin), return', origin);
         return replies.trip.noSlug(origin);
     }
     if (hasDestination && !destinationMeta) {
+        // console.log('no slug (destination), return', destination);
         return replies.trip.noSlug(destination);
     }
     if (hasOrigin && !hasDestination) {
+        // console.log('no destination, return');
         return replies.trip.noDestination();
     }
     if (hasDestination && !hasOrigin) {
+        // console.log('no origin, return');
         return replies.trip.noOrigin();
     }
     const day = timeFilter && timeFilter.from
@@ -138,19 +143,23 @@ const tripDialogReply = context => {
         const from = originMeta.slugs[0];
         const to = destinationMeta.slugs[0];
         const url = `${CLICKBUS_URL}/trips?from=${from}&to=${to}&departure=${departureDay}`;
+        // console.log('need to make api call, return', url);
         return {
             url,
             departureDay
         };
     }
     if (!originMeta || !destinationMeta) {
+        // console.log('missing metadata', origin, destination);
         return replies.trip.noTrips(origin, destination);
     }
 
     if (hasDestination && hasOrigin && hasTrips && hasNoTrips) {
+        // console.log('has metadata but api returned 0 results', shortUrl);
         return replies.trip.noTripsWithUrl(origin, destination, shortUrl);
     }
 
+    // console.log('filter trips filteredTripsByBusType');
     const filteredTripsByBusType = hasBustypeFilters ? trips.filter(trip => {
         const busTypeId = parseInt(trip.busTypeId, 10);
         // array flatten in js http://stackoverflow.com/a/10865042/2052311
@@ -161,6 +170,15 @@ const tripDialogReply = context => {
         return result;
     }) : trips;
 
+    // console.log('build hasBustypeFilters array');
+    const btfValues = hasBustypeFilters
+        ? busTypeFilters.reduce((prev, curr) => (
+            prev.indexOf(curr.value) === -1
+                ? prev.concat(curr.value)
+                : prev
+        ), [])
+        : null;
+
     console.log('filteredTripsByBusType.length', filteredTripsByBusType.length, trips.length);
 
     if (hasDestination && hasOrigin && hasTrips && timeFilter &&
@@ -169,7 +187,6 @@ const tripDialogReply = context => {
         const filteredTripsAfter = filteredTripsByBusType.filter(trip =>
             trip.departureTime.isAfter(timeFilter.from.value)
         );
-
 
         if (timeFilter.to === null) {
             const tripListAfter = filteredTripsAfter.map(trip => {
@@ -193,17 +210,22 @@ const tripDialogReply = context => {
                 shortUrl,
                 filteredTripsAfter
             );
+            const results = filteredTripsAfter.length
+                ? tripListAfter
+                : null;
+            const textReply = replies.trip.filteredDepartureList(
+                origin,
+                destination,
+                results,
+                shortUrl,
+                {
+                    timeFilterFrom: moment(timeFilter.from.value),
+                    timeFilterTo: null,
+                    busTypeFilters: btfValues
+                }
+            );
             return {
-                textReply: replies.trip.filteredDepartureListAfter(
-                    origin,
-                    destination,
-                    moment(timeFilter.from.value),
-                    filteredTripsAfter.length,
-                    shortUrl,
-                    (filteredTripsAfter.length < tripListSizeThreshold)
-                        ? tripListAfter.join('\n')
-                        : null
-                ),
+                textReply,
                 structuredRely
             };
         }
@@ -231,18 +253,22 @@ const tripDialogReply = context => {
             shortUrl,
             filteredTripsBetween
         );
+        const results = filteredTripsBetween.length
+            ? tripListBetween
+            : null;
+        const textReply = replies.trip.filteredDepartureList(
+            origin,
+            destination,
+            results,
+            shortUrl,
+            {
+                timeFilterFrom: moment(timeFilter.from.value),
+                timeFilterTo: moment(timeFilter.to.value),
+                busTypeFilters: btfValues
+            }
+        );
         return {
-            textReply: replies.trip.filteredDepartureListBetween(
-                origin,
-                destination,
-                moment(timeFilter.from.value),
-                moment(timeFilter.to.value),
-                filteredTripsBetween.length,
-                shortUrl,
-                (filteredTripsBetween.length < tripListSizeThreshold)
-                    ? tripListBetween
-                    : null
-            ),
+            textReply,
             structuredRely
         };
     }
@@ -267,15 +293,23 @@ const tripDialogReply = context => {
         filteredTripsByBusType
     );
     // console.log('structuredRely', JSON.stringify(structuredRely));
+
+    const results = filteredTripsByBusType.length
+        ? filteredTripsByBusType
+        : null;
+    const textReply = replies.trip.filteredDepartureList(
+        origin,
+        destination,
+        results,
+        shortUrl,
+        {
+            timeFilterFrom: day,
+            timeFilterTo: null,
+            busTypeFilters: btfValues
+        }
+    );
     return {
-        textReply: replies.trip.departureList(
-            origin,
-            destination,
-            departureDay,
-            filteredTripsByBusType.length,
-            shortUrl,
-            filteredTripsByBusType.length < tripListSizeThreshold ? tripList : null
-        ),
+        textReply,
         structuredRely
     };
 };
