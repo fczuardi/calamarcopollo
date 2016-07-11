@@ -45,7 +45,8 @@ const defaultReplies = {
         noPlaces: () => 'Certo… preciso saber da origem e do destino',
         noDestination: () => 'E qual o destino?',
         noOrigin: () => 'Saindo de onde?',
-        requestingWithFilters: (origin, destination, { timeFilterFrom, timeFilterTo, busTypeFilters }) => {
+        requestingWithFilters: (origin, destination,
+            { timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
             const begin = 'Só um minuto, vou buscar aqui… (';
             const end = ')';
             const places = `${origin} 🚌 ${destination}`;
@@ -58,7 +59,10 @@ const defaultReplies = {
             const busType = busTypeFilters
                 ? `😴 ${busTypeFilters.join(' ou ')}`
                 : null;
-            const content = [places, day, timeInterval, busType]
+            const priceSort = priceFilter
+                ? `ordenadas por ${priceFilter.value.slice(0, -5)} preço`
+                : null;
+            const content = [places, day, timeInterval, busType, priceSort]
                 .filter(i => i !== null)
                 .join(', ');
             return begin + content + end;
@@ -77,7 +81,7 @@ const defaultReplies = {
         listItemFb: (company, departure, arrival, seats, duration) =>
             `${departure.name} ${departure.time} → ${arrival.name} ${arrival.time}, ${duration} minutos.`,
         filteredDepartureList: (origin, destination, results, url,
-            { timeFilterFrom, timeFilterTo, busTypeFilters }) => {
+            { timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
             const optionsSize = results ? results.length : 0;
             const day = dayString(timeFilterFrom, dayStrings);
             const headerBegin = `De ${origin} para ${destination} ${day}, `;
@@ -91,7 +95,10 @@ const defaultReplies = {
             const busType = busTypeFilters
                 ? `😴 ${busTypeFilters.join(' ou ')}, `
                 : '';
-            const header = `${headerBegin}${intervalFilter}${busType}${headerEnd}`;
+            const priceSort = priceFilter
+                ? `ordenadas por ${priceFilter.value.slice(0, -5)} preço, `
+                : null;
+            const header = `${headerBegin}${intervalFilter}${busType}${priceSort}${headerEnd}`;
             const body = `${results ? `:\n\n${results}` : '.'}`;
             const footer = `Para ver todas as opções desse dia acesse ${url}`;
             return { header, body, footer };

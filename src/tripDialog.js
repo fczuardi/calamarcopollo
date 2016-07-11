@@ -86,10 +86,37 @@ const buildLastFacebookElement = url => (
 );
 
 const busTypeValueIds = {
-    'convencional': [1],
+    convencional: [1],
     'semi-leito': [2, 3],
-    'leito': [4, 5, 6, 7, 8, 9]
+    leito: [4, 5, 6, 7, 8, 9]
 };
+
+const sortTripByDepartureTime = (tripA, tripB) => (
+    tripA.departureTime.isBefore(tripB.departureTime) ? -1 : 1
+);
+const sortTripsByPriceAscending = (tripA, tripB) => {
+    const priceA = parseInt(tripA.price, 10);
+    const priceB = parseInt(tripB.price, 10);
+    if (priceA < priceB) {
+        return -1;
+    }
+    if (priceA > priceB) {
+        return 1;
+    }
+    return sortTripByDepartureTime(tripA, tripB);
+};
+const sortTripsByPriceDescending = (tripA, tripB) => {
+    const priceA = parseInt(tripA.price, 10);
+    const priceB = parseInt(tripB.price, 10);
+    if (priceA > priceB) {
+        return -1;
+    }
+    if (priceA < priceB) {
+        return 1;
+    }
+    return sortTripByDepartureTime(tripA, tripB);
+};
+
 
 const tripDialogReply = context => {
     const {
@@ -112,6 +139,7 @@ const tripDialogReply = context => {
     const hasTrips = trips !== undefined;
     const hasNoTrips = hasTrips && !trips.length;
     const hasBustypeFilters = busTypeFilters && busTypeFilters.length;
+    const hasPriceFilter = priceFilter !== undefined;
     if (hasApiError) {
         // console.log('hasApiError, return', apiError);
         return replies.trip.apiError(apiError);
@@ -181,28 +209,22 @@ const tripDialogReply = context => {
 
     console.log('filteredTripsByBusType.length', filteredTripsByBusType.length, trips.length);
 
+    const sortByPrice = hasPriceFilter && priceFilter.value !== 'maiorPreco'
+        ? sortTripsByPriceAscending
+        : sortTripsByPriceDescending;
+    const sortedTrips = hasPriceFilter
+        ? filteredTripsByBusType.sort(sortByPrice)
+        : filteredTripsByBusType;
+
+
     if (hasDestination && hasOrigin && hasTrips && timeFilter &&
                 timeFilter.from && timeFilter.from.grain !== 'day') {
         // Filter trips after a day time
-        const filteredTripsAfter = filteredTripsByBusType.filter(trip =>
+        const filteredTripsAfter = sortedTrips.filter(trip =>
             trip.departureTime.isAfter(timeFilter.from.value)
         );
 
         if (timeFilter.to === null) {
-            const tripListAfter = filteredTripsAfter.map(trip => {
-                const departure = {
-                    time: moment(trip.departureTime).format('DD/MM HH:mm'),
-                    name: trip.departurePlace
-                };
-                const arrival = {
-                    time: moment(trip.arrivalTime).format('DD/MM HH:mm'),
-                    name: trip.arrivalPlace
-                };
-                const company = trip.busCompanyName;
-                const seats = trip.availableSeats;
-
-                return replies.trip.listItemTg(company, departure, arrival, seats);
-            });
             const structuredRely = buildFacebookElements(
                 originMeta.slugs[0],
                 destinationMeta.slugs[0],
@@ -211,7 +233,7 @@ const tripDialogReply = context => {
                 filteredTripsAfter
             );
             const results = filteredTripsAfter.length
-                ? tripListAfter
+                ? filteredTripsAfter
                 : null;
             const textReply = replies.trip.filteredDepartureList(
                 origin,
@@ -221,7 +243,8 @@ const tripDialogReply = context => {
                 {
                     timeFilterFrom: moment(timeFilter.from.value),
                     timeFilterTo: null,
-                    busTypeFilters: btfValues
+                    busTypeFilters: btfValues,
+                    priceFilter
                 }
             );
             return {
@@ -233,19 +256,6 @@ const tripDialogReply = context => {
         const filteredTripsBetween = filteredTripsAfter.filter(trip =>
             trip.departureTime.isBefore(timeFilter.to.value)
         );
-        const tripListBetween = filteredTripsBetween.map(trip => {
-            const departure = {
-                time: moment(trip.departureTime).format('DD/MM HH:mm'),
-                name: trip.departurePlace
-            };
-            const arrival = {
-                time: moment(trip.arrivalTime).format('DD/MM HH:mm'),
-                name: trip.arrivalPlace
-            };
-            const company = trip.busCompanyName;
-            const seats = trip.availableSeats;
-            return replies.trip.listItemTg(company, departure, arrival, seats);
-        }).join('\n');
         const structuredRely = buildFacebookElements(
             originMeta.slugs[0],
             destinationMeta.slugs[0],
@@ -254,7 +264,7 @@ const tripDialogReply = context => {
             filteredTripsBetween
         );
         const results = filteredTripsBetween.length
-            ? tripListBetween
+            ? filteredTripsBetween
             : null;
         const textReply = replies.trip.filteredDepartureList(
             origin,
@@ -264,7 +274,8 @@ const tripDialogReply = context => {
             {
                 timeFilterFrom: moment(timeFilter.from.value),
                 timeFilterTo: moment(timeFilter.to.value),
-                busTypeFilters: btfValues
+                busTypeFilters: btfValues,
+                priceFilter
             }
         );
         return {
@@ -272,30 +283,17 @@ const tripDialogReply = context => {
             structuredRely
         };
     }
-    const tripList = filteredTripsByBusType.map(trip => {
-        const departure = {
-            time: moment(trip.departureTime).format('DD/MM HH:mm'),
-            name: trip.departurePlace
-        };
-        const arrival = {
-            time: moment(trip.arrivalTime).format('DD/MM HH:mm'),
-            name: trip.arrivalPlace
-        };
-        const company = trip.busCompanyName;
-        const seats = trip.availableSeats;
-        return replies.trip.listItemTg(company, departure, arrival, seats);
-    }).join('\n');
     const structuredRely = buildFacebookElements(
         originMeta.slugs[0],
         destinationMeta.slugs[0],
         sessionCookie,
         shortUrl,
-        filteredTripsByBusType
+        sortedTrips
     );
     // console.log('structuredRely', JSON.stringify(structuredRely));
 
-    const results = filteredTripsByBusType.length
-        ? filteredTripsByBusType
+    const results = sortedTrips.length
+        ? sortedTrips
         : null;
     const textReply = replies.trip.filteredDepartureList(
         origin,
@@ -305,7 +303,8 @@ const tripDialogReply = context => {
         {
             timeFilterFrom: day,
             timeFilterTo: null,
-            busTypeFilters: btfValues
+            busTypeFilters: btfValues,
+            priceFilter
         }
     );
     return {
