@@ -122,34 +122,45 @@ const sortTripsByPriceDescending = (tripA, tripB) => {
     return sortTripByDepartureTime(tripA, tripB);
 };
 
-const getExpandedResults = (sortedTrips, filteredTripsAfter, filteredTripsBetween, filteredTripsByBusType) => {
+const getExpandedResults = (
+    sortedTrips,
+    filteredTripsAfter,
+    filteredTripsBetween,
+    filteredTripsByBusType) => {
+
     let excludedFilters = [];
 
-    if (filteredTripsByBusType.length > 0) {
-        const result = {
-            excludedFilters,
-            results: filteredTripsByBusType
-        };
-        return result;
+    if (filteredTripsByBusType) {
+        if (filteredTripsByBusType.length > 0) {
+            const result = {
+                excludedFilters,
+                results: filteredTripsByBusType
+            };
+            return result;
+        }
+        excludedFilters.push('busTypeFilters');
     }
-    excludedFilters.push('busTypeFilters');
 
-    if (filteredTripsBetween.length > 0) {
-        const result = {
-            excludedFilters,
-            results: filteredTripsBetween
-        };
-        return result;
+    if (filteredTripsBetween) {
+        if (filteredTripsBetween.length > 0) {
+            const result = {
+                excludedFilters,
+                results: filteredTripsBetween
+            };
+            return result;
+        }
+        excludedFilters.push('timeFilterTo');
     }
-    excludedFilters.push('timeFilterTo');
 
-    if (filteredTripsAfter.length > 0) {
-        return {
-            excludedFilters,
-            results: filteredTripsAfter
-        };
+    if (filteredTripsAfter) {
+        if (filteredTripsAfter.length > 0) {
+            return {
+                excludedFilters,
+                results: filteredTripsAfter
+            };
+        }
+        excludedFilters.push('timeFilterFrom');
     }
-    excludedFilters.push('timeFilterFrom');
 
     return {
         excludedFilters,
@@ -277,7 +288,12 @@ const tripDialogReply = context => {
                 const {
                     results,
                     excludedFilters
-                } = getExpandedResults(sortedTrips, filteredTripsAfter, filteredTripsBetween, filterByBusType(filteredTripsBetween, busTypeFilters));
+                } = getExpandedResults(
+                    sortedTrips,
+                    filteredTripsAfter,
+                    filteredTripsBetween,
+                    filterByBusType(filteredTripsBetween, busTypeFilters)
+                );
                 console.log('excludedFilters', excludedFilters);
                 const structuredRely = buildFacebookElements(
                     originMeta.slugs[0],
@@ -310,7 +326,12 @@ const tripDialogReply = context => {
             const {
                 results,
                 excludedFilters
-            } = getExpandedResults(sortedTrips, filteredTripsAfter, [], filterByBusType(filteredTripsAfter, busTypeFilters));
+            } = getExpandedResults(
+                sortedTrips,
+                filteredTripsAfter,
+                null,
+                filterByBusType(filteredTripsAfter, busTypeFilters)
+            );
             console.log('excludedFilters', excludedFilters, filterByBusType(filteredTripsAfter, busTypeFilters).length);
             const structuredRely = buildFacebookElements(
                 originMeta.slugs[0],
@@ -347,7 +368,12 @@ const tripDialogReply = context => {
             const {
                 results,
                 excludedFilters
-            } = getExpandedResults(sortedTrips, sortedTrips, filteredTripsBefore, filterByBusType(filteredTripsBefore, busTypeFilters));
+            } = getExpandedResults(
+                sortedTrips,
+                sortedTrips,
+                filteredTripsBefore,
+                filterByBusType(filteredTripsBefore, busTypeFilters)
+            );
             console.log('excludedFilters', excludedFilters);
             const structuredRely = buildFacebookElements(
                 originMeta.slugs[0],
@@ -379,7 +405,12 @@ const tripDialogReply = context => {
     const {
         results,
         excludedFilters
-    } = getExpandedResults(sortedTrips, [], [], filterByBusType(sortedTrips, busTypeFilters));
+    } = getExpandedResults(
+        sortedTrips,
+        null,
+        null,
+        filterByBusType(sortedTrips, busTypeFilters)
+    );
     console.log('excludedFilters', excludedFilters);
     const structuredRely = buildFacebookElements(
         originMeta.slugs[0],

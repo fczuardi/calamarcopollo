@@ -105,15 +105,17 @@ const defaultReplies = {
                 : '';
             const priceSort = priceFilter
                 ? `ordenadas por ${priceFilter.value.slice(0, -5)} preço, `
-                : null;
+                : '';
             let header = headerBegin;
             switch (excludedFilters.length) {
             case 1:
+                header = `${headerBegin}${intervalFilter}${busType}${priceSort}não achei nada. Mas ${dayText}${intervalFilter}${priceSort} tenho ${optionsSize}`;
+                break;
             case 2:
-                header = `${headerBegin}não achei nada. Mas ${intervalFilter}${priceSort} tenho ${optionsSize}`;
+                header = `${headerBegin}${intervalFilter}${busType}${priceSort}não achei nada. Mas ${intervalFilter}${priceSort} tenho ${optionsSize}`;
                 break;
             case 3:
-                header = `${headerBegin}não achei nada. Mas neste dia ${priceSort} tenho ${optionsSize}`;
+                header = `${headerBegin}${intervalFilter}${busType}${priceSort}não achei nada. Mas neste dia ${priceSort} tenho ${optionsSize}`;
                 break;
             default:
                 header = `${headerBegin}${intervalFilter}${busType}${priceSort}${headerEnd}`;
