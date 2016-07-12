@@ -39,7 +39,7 @@ const polloSanitize = text => latinize(text)
     // @HACK wit has trouble with sao carlos
     .replace(/sao carlos/, 'sanca')
     // @HACK wit has trouble with um onibus
-    .replace(/um onibus/, 'umOnibus')
+    .replace(/um onibus/, 'Onibus')
 ;
 
 export { dayString, polloSanitize, durationFormat };
