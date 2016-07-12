@@ -221,6 +221,17 @@ const onUpdate = async ({ bot, update }) => {
             });
         });
 
+        // bot already have the responses, clear busTypeFilters and priceFilter
+        const nextContext = {
+            ...context,
+            busTypeFilters: undefined,
+            priceFilter: undefined
+        };
+        store.dispatch(updateChatSession({
+            chat: { ...chat, session: nextContext }
+        }));
+
+        // send query results to user
         if (
             botType === 'facebookMessenger' &&
             secondReply.structuredRely &&
