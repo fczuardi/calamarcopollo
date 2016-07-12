@@ -105,6 +105,7 @@ const routes = [[
             origin,
             destination,
             busTypeFilters,
+            priceFilter,
             timeFilter
         } = extractEntities(outcomes);
         const {
@@ -118,6 +119,7 @@ const routes = [[
             hasOrigin ||
             hasUnknownPlace ||
             busTypeFilters ||
+            priceFilter ||
             timeFilter
         );
         return result;
@@ -129,6 +131,7 @@ const routes = [[
             origin,
             destination,
             busTypeFilters,
+            priceFilter,
             timeFilter
         } = extractEntities(outcomes);
         const {
@@ -143,6 +146,9 @@ const routes = [[
         }
         if (busTypeFilters && busTypeFilters.length) {
             nextContext.busTypeFilters = busTypeFilters;
+        }
+        if (priceFilter) {
+            nextContext.priceFilter = priceFilter;
         }
         if (hasOrigin) {
             // console.log('1 origin', origin);
