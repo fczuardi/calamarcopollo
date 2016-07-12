@@ -74,8 +74,8 @@ const defaultReplies = {
             `Não consegui encontrar viagens de ${origin} para ${destination}`,
         noTripsWithUrl: (origin, destination) =>
             `Não encontrei nenhuma viagem de ${origin} para ${destination}`,
-        listTitle: (company, departure, seats, duration, price) =>
-            `${company} ${departure.format('HH:mm')}, ${price}, ${seats} lugar${seats !== '1' ? 'es' : ''}, ${durationFormat(duration)}`,
+        listTitle: (company, departure, seats, duration, price, busType) =>
+            `${company} ${departure.format('HH:mm')}, ${price}, ${busType}, ${seats} lugar${seats !== '1' ? 'es' : ''}, ${durationFormat(duration)}`,
         listItemTg: (company, departure, arrival, seats, duration) =>
             `${company}: ${departure.name} ${departure.time} 🚌  ${arrival.name} ${arrival.time}, ${duration} minutos ${seats} lugar${seats !== '1' ? 'es' : ''} disponíve${seats !== '1' ? 'is' : 'l'}.`,
         listItemFb: (company, departure, arrival, seats, duration) =>

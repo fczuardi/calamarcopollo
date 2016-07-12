@@ -17,6 +17,7 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
             departureTime,
             busCompanyName,
             // busCompanyLogo,
+            busType,
             availableSeats,
             duration,
             scheduleId
@@ -35,7 +36,7 @@ const buildFacebookElements = (origin, destination, session, searchUrl, trips) =
         const seats = availableSeats;
         const formattedPrice = `R$${price.slice(0, -2)},${price.slice(-2)}`;
         const title = replies.trip.listTitle(
-            company, departureTime, availableSeats, duration, formattedPrice
+            company, departureTime, availableSeats, duration, formattedPrice, busType
         );
         const subtitle = replies.trip.listItemFb(company, departure, arrival, seats, duration, true);
         const baseURL = `${process.env.BOT_URL}${process.env.POST_TO_CLICKBUS_HACK_PATH}`;
