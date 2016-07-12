@@ -46,14 +46,14 @@ const defaultReplies = {
         noDestination: () => 'E qual o destino?',
         noOrigin: () => 'Saindo de onde?',
         requestingWithFilters: (origin, destination,
-            { timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
+            { day, timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
             const begin = 'Só um minuto, vou buscar aqui… (';
             const end = ')';
             const places = `${origin} 🚌 ${destination}`;
-            const day = timeFilterFrom
-                ? `🗓 ${timeFilterFrom.format('DD/MM/YYYY')})`
+            const dayText = day
+                ? `🗓 ${day.format('DD/MM/YYYY')})`
                 : null;
-            const timeInterval = day
+            const timeInterval = timeFilterFrom
                 ? `🕙 ${timeFilterFrom.format('HH:mm')}${timeFilterTo ? ` - ${timeFilterTo.format('HH:mm')}` : ''})`
                 : null;
             const busType = busTypeFilters
@@ -62,7 +62,7 @@ const defaultReplies = {
             const priceSort = priceFilter
                 ? `ordenadas por ${priceFilter.value.slice(0, -5)} preço`
                 : null;
-            const content = [places, day, timeInterval, busType, priceSort]
+            const content = [places, dayText, timeInterval, busType, priceSort]
                 .filter(i => i !== null)
                 .join(', ');
             return begin + content + end;
@@ -81,10 +81,10 @@ const defaultReplies = {
         listItemFb: (company, departure, arrival, seats, duration) =>
             `${departure.name} ${departure.time} → ${arrival.name} ${arrival.time}, ${duration} minutos.`,
         filteredDepartureList: (origin, destination, results, url,
-            { timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
+            { day, timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
             const optionsSize = results ? results.length : 0;
-            const day = dayString(timeFilterFrom, dayStrings);
-            const headerBegin = `De ${origin} para ${destination} ${day}, `;
+            const dayText = dayString(day, dayStrings);
+            const headerBegin = `De ${origin} para ${destination} ${dayText}, `;
             const headerEnd = `tenho ${optionsSize} opç${optionsSize === 1 ? 'ão' : 'ões'}`;
             const intervalFilterAfter = timeFilterFrom
                 ? `depois das ${timeFilterFrom.format('HH:mm')}, `

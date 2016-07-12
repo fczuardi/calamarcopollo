@@ -242,6 +242,7 @@ const tripDialogReply = context => {
                 results,
                 shortUrl,
                 {
+                    day,
                     timeFilterFrom: moment(timeFilter.from.value),
                     timeFilterTo: null,
                     busTypeFilters: btfValues,
@@ -273,6 +274,7 @@ const tripDialogReply = context => {
             results,
             shortUrl,
             {
+                day,
                 timeFilterFrom: moment(timeFilter.from.value),
                 timeFilterTo: moment(timeFilter.to.value),
                 busTypeFilters: btfValues,
@@ -302,7 +304,8 @@ const tripDialogReply = context => {
         results,
         shortUrl,
         {
-            timeFilterFrom: day,
+            day,
+            timeFilterFrom: null,
             timeFilterTo: null,
             busTypeFilters: btfValues,
             priceFilter

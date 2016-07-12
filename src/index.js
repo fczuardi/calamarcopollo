@@ -100,6 +100,7 @@ const onUpdate = async ({ bot, update }) => {
         const timeFilterFrom = context.timeFilter && context.timeFilter.from
             ? moment(context.timeFilter.from.value)
             : null;
+        const day = timeFilterFrom || moment();
         const timeFilterTo = context.timeFilter && context.timeFilter.to
             ? moment(context.timeFilter.to.value)
             : null;
@@ -110,16 +111,17 @@ const onUpdate = async ({ bot, update }) => {
                     ? prev.concat(curr.value)
                     : prev
             ), []) : null;
-        const priceFilter = context.priceFilter
+        const priceFilter = context.priceFilter;
         console.log('busTypeFilters', busTypeFilters);
         const replyText = replies.trip.requestingWithFilters(
             context.origin,
             context.destination,
             {
+                day,
                 timeFilterFrom,
                 timeFilterTo,
                 busTypeFilters,
-                priceFilter: context.priceFilter
+                priceFilter
             }
         );
         bot.sendMessage({
