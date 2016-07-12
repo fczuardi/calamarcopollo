@@ -100,6 +100,11 @@ const onUpdate = async ({ bot, update }) => {
         const timeFilterFrom = context.timeFilter && context.timeFilter.from
             ? moment(context.timeFilter.from.value)
             : null;
+        const timeFilterFromHour = (
+            context.timeFilter &&
+            context.timeFilter.from &&
+            context.timeFilter.from.grain !== 'day'
+        ) ? timeFilterFrom : null;
         const day = timeFilterFrom || moment();
         const timeFilterTo = context.timeFilter && context.timeFilter.to
             ? moment(context.timeFilter.to.value)
@@ -118,7 +123,7 @@ const onUpdate = async ({ bot, update }) => {
             context.destination,
             {
                 day,
-                timeFilterFrom,
+                timeFilterFrom: timeFilterFromHour,
                 timeFilterTo,
                 busTypeFilters,
                 priceFilter
