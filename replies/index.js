@@ -81,11 +81,19 @@ const defaultReplies = {
         listItemFb: (company, departure, arrival, seats, duration) =>
             `${departure.name} ${departure.time} → ${arrival.name} ${arrival.time}, ${duration} minutos.`,
         filteredDepartureList: (origin, destination, results, url,
-            { day, timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter }) => {
+            { day, timeFilterFrom, timeFilterTo, busTypeFilters, priceFilter, excludedFilters }) => {
+
+            // Possible values for excludedFilters
+            // []
+            // ['busTypeFilters']
+            // ['busTypeFilters', 'timeFilterTo']
+            // ['busTypeFilters', 'timeFilterTo', 'timeFilterFrom']
+
             const optionsSize = results ? results.length : 0;
+            const firstOptionSize = excludedFilters.length ? 0 : optionsSize;
             const dayText = dayString(day, dayStrings);
             const headerBegin = `De ${origin} para ${destination} ${dayText}, `;
-            const headerEnd = `tenho ${optionsSize} opç${optionsSize === 1 ? 'ão' : 'ões'}`;
+            const headerEnd = `tenho ${firstOptionSize} opç${firstOptionSize === 1 ? 'ão' : 'ões'}`;
             const intervalFilterAfter = timeFilterFrom
                 ? `depois das ${timeFilterFrom.format('HH:mm')}, `
                 : '';
@@ -98,7 +106,19 @@ const defaultReplies = {
             const priceSort = priceFilter
                 ? `ordenadas por ${priceFilter.value.slice(0, -5)} preço, `
                 : null;
-            const header = `${headerBegin}${intervalFilter}${busType}${priceSort}${headerEnd}`;
+            let header = headerBegin;
+            switch (excludedFilters.length) {
+            case 1:
+            case 2:
+                header = `${headerBegin}não achei nada. Mas ${intervalFilter}${priceSort} tenho ${optionsSize}`;
+                break;
+            case 3:
+                header = `${headerBegin}não achei nada. Mas neste dia ${priceSort} tenho ${optionsSize}`;
+                break;
+            default:
+                header = `${headerBegin}${intervalFilter}${busType}${priceSort}${headerEnd}`;
+                break;
+            }
             const body = `${results ? `:\n\n${results}` : '.'}`;
             const footer = `Para ver todas as opções desse dia acesse ${url}`;
             return { header, body, footer };

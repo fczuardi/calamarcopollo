@@ -7,7 +7,11 @@ const CLICKBUS_SVG_LOGO_URL = process.env.CLICKBUS_SVG_LOGO_URL || 'https://m.cl
 const MORE_RESULTS_IMAGE_URL = process.env.MORE_RESULTS_IMAGE_URL;
 
 const buildFacebookElements = (origin, destination, session, searchUrl, trips) => {
-    console.log('buildFacebookElements');
+    if (!trips || !trips.length ){
+        console.log('buildFacebookElements', trips);
+        return [];
+    }
+    console.log('buildFacebookElements', trips.length);
     const result = trips.map(trip => {
         const {
             price,
@@ -118,6 +122,53 @@ const sortTripsByPriceDescending = (tripA, tripB) => {
     return sortTripByDepartureTime(tripA, tripB);
 };
 
+const getExpandedResults = (sortedTrips, filteredTripsAfter, filteredTripsBetween, filteredTripsByBusType) => {
+    let excludedFilters = [];
+
+    if (filteredTripsByBusType.length > 0) {
+        const result = {
+            excludedFilters,
+            results: filteredTripsByBusType
+        };
+        return result;
+    }
+    excludedFilters.push('busTypeFilters');
+
+    if (filteredTripsBetween.length > 0) {
+        const result = {
+            excludedFilters,
+            results: filteredTripsBetween
+        };
+        return result;
+    }
+    excludedFilters.push('timeFilterTo');
+
+    if (filteredTripsAfter.length > 0) {
+        return {
+            excludedFilters,
+            results: filteredTripsAfter
+        };
+    }
+    excludedFilters.push('timeFilterFrom');
+
+    return {
+        excludedFilters,
+        results: sortedTrips
+    };
+};
+
+const filterByBusType = (trips, busTypeFilters) => {
+    const hasBustypeFilters = busTypeFilters && busTypeFilters.length;
+    return hasBustypeFilters ? trips.filter(trip => {
+        const busTypeId = parseInt(trip.busTypeId, 10);
+        // array flatten in js http://stackoverflow.com/a/10865042/2052311
+        const busTypeIds = [].concat.apply([],
+            busTypeFilters.map(busTypeEntity => busTypeValueIds[busTypeEntity.value])
+        );
+        const result = busTypeIds.indexOf(busTypeId) !== -1;
+        return result;
+    }) : trips;
+}
 
 const tripDialogReply = context => {
     const {
@@ -188,17 +239,6 @@ const tripDialogReply = context => {
         return replies.trip.noTripsWithUrl(origin, destination, shortUrl);
     }
 
-    // console.log('filter trips filteredTripsByBusType');
-    const filteredTripsByBusType = hasBustypeFilters ? trips.filter(trip => {
-        const busTypeId = parseInt(trip.busTypeId, 10);
-        // array flatten in js http://stackoverflow.com/a/10865042/2052311
-        const busTypeIds = [].concat.apply([],
-            busTypeFilters.map(busTypeEntity => busTypeValueIds[busTypeEntity.value])
-        );
-        const result = busTypeIds.indexOf(busTypeId) !== -1;
-        return result;
-    }) : trips;
-
     // console.log('build hasBustypeFilters array');
     const btfValues = hasBustypeFilters
         ? busTypeFilters.reduce((prev, curr) => (
@@ -208,34 +248,77 @@ const tripDialogReply = context => {
         ), [])
         : null;
 
-    console.log('filteredTripsByBusType.length', filteredTripsByBusType.length, trips.length);
+    // console.log('filteredTripsByBusType.length', filteredTripsByBusType.length, trips.length);
 
     const sortByPrice = hasPriceFilter && priceFilter.value !== 'maiorPreco'
         ? sortTripsByPriceAscending
         : sortTripsByPriceDescending;
     const sortedTrips = hasPriceFilter
-        ? filteredTripsByBusType.sort(sortByPrice)
-        : filteredTripsByBusType;
+        ? trips.sort(sortByPrice)
+        : trips;
 
 
-    if (hasDestination && hasOrigin && hasTrips && timeFilter &&
-                timeFilter.from && timeFilter.from.grain !== 'day') {
-        // Filter trips after a day time
-        const filteredTripsAfter = sortedTrips.filter(trip =>
-            trip.departureTime.isSameOrAfter(timeFilter.from.value)
-        );
+    if (hasDestination && hasOrigin && hasTrips && timeFilter) {
+        const hasIntervalFrom = (
+            timeFilter.from && timeFilter.from.value && timeFilter.from.grain !== 'day');
+        const hasIntervalTo = (
+            timeFilter.to && timeFilter.to.value && timeFilter.to.grain !== 'day');
+        if (hasIntervalFrom) {
+            // Filter trips after a day time
+            const filteredTripsAfter = sortedTrips.filter(trip =>
+                trip.departureTime.isSameOrAfter(timeFilter.from.value)
+            );
 
-        if (timeFilter.to === null) {
+            if (hasIntervalTo) {
+                // Filter trips after a day time and before another time
+                const filteredTripsBetween = filteredTripsAfter.filter(trip =>
+                    trip.departureTime.isSameOrBefore(timeFilter.to.value)
+                );
+                const {
+                    results,
+                    excludedFilters
+                } = getExpandedResults(sortedTrips, filteredTripsAfter, filteredTripsBetween, filterByBusType(filteredTripsBetween, busTypeFilters));
+                console.log('excludedFilters', excludedFilters);
+                const structuredRely = buildFacebookElements(
+                    originMeta.slugs[0],
+                    destinationMeta.slugs[0],
+                    sessionCookie,
+                    shortUrl,
+                    results
+                );
+                const textReply = replies.trip.filteredDepartureList(
+                    origin,
+                    destination,
+                    results,
+                    shortUrl,
+                    {
+                        day,
+                        timeFilterFrom: moment(timeFilter.from.value),
+                        timeFilterTo: moment(timeFilter.to.value),
+                        busTypeFilters: btfValues,
+                        priceFilter,
+                        excludedFilters
+                    }
+                );
+                return {
+                    textReply,
+                    structuredRely
+                };
+            }
+
+            console.log('!hasIntervalTo . . . . .');
+            const {
+                results,
+                excludedFilters
+            } = getExpandedResults(sortedTrips, filteredTripsAfter, [], filterByBusType(filteredTripsAfter, busTypeFilters));
+            console.log('excludedFilters', excludedFilters, filterByBusType(filteredTripsAfter, busTypeFilters).length);
             const structuredRely = buildFacebookElements(
                 originMeta.slugs[0],
                 destinationMeta.slugs[0],
                 sessionCookie,
                 shortUrl,
-                filteredTripsAfter
+                results
             );
-            const results = filteredTripsAfter.length
-                ? filteredTripsAfter
-                : null;
             const textReply = replies.trip.filteredDepartureList(
                 origin,
                 destination,
@@ -246,7 +329,8 @@ const tripDialogReply = context => {
                     timeFilterFrom: moment(timeFilter.from.value),
                     timeFilterTo: null,
                     busTypeFilters: btfValues,
-                    priceFilter
+                    priceFilter,
+                    excludedFilters
                 }
             );
             return {
@@ -254,50 +338,59 @@ const tripDialogReply = context => {
                 structuredRely
             };
         }
-        // Filter trips after a day time and before another time
-        const filteredTripsBetween = filteredTripsAfter.filter(trip =>
-            trip.departureTime.isSameOrBefore(timeFilter.to.value)
-        );
-        const structuredRely = buildFacebookElements(
-            originMeta.slugs[0],
-            destinationMeta.slugs[0],
-            sessionCookie,
-            shortUrl,
-            filteredTripsBetween
-        );
-        const results = filteredTripsBetween.length
-            ? filteredTripsBetween
-            : null;
-        const textReply = replies.trip.filteredDepartureList(
-            origin,
-            destination,
-            results,
-            shortUrl,
-            {
-                day,
-                timeFilterFrom: moment(timeFilter.from.value),
-                timeFilterTo: moment(timeFilter.to.value),
-                busTypeFilters: btfValues,
-                priceFilter
-            }
-        );
-        return {
-            textReply,
-            structuredRely
-        };
+        if (!hasIntervalFrom && hasIntervalTo) {
+            // Filter trips before a day time
+            const filteredTripsBefore = sortedTrips.filter(trip =>
+                trip.departureTime.isSameOrBefore(timeFilter.to.value)
+            );
+            console.log('---filteredTripsBefore', filteredTripsBefore.length, sortedTrips.length);
+            const {
+                results,
+                excludedFilters
+            } = getExpandedResults(sortedTrips, sortedTrips, filteredTripsBefore, filterByBusType(filteredTripsBefore, busTypeFilters));
+            console.log('excludedFilters', excludedFilters);
+            const structuredRely = buildFacebookElements(
+                originMeta.slugs[0],
+                destinationMeta.slugs[0],
+                sessionCookie,
+                shortUrl,
+                results
+            );
+            const textReply = replies.trip.filteredDepartureList(
+                origin,
+                destination,
+                results,
+                shortUrl,
+                {
+                    day,
+                    timeFilterFrom: moment(timeFilter.from.value),
+                    timeFilterTo: null,
+                    busTypeFilters: btfValues,
+                    priceFilter,
+                    excludedFilters
+                }
+            );
+            return {
+                textReply,
+                structuredRely
+            };
+        }
     }
+    const {
+        results,
+        excludedFilters
+    } = getExpandedResults(sortedTrips, [], [], filterByBusType(sortedTrips, busTypeFilters));
+    console.log('excludedFilters', excludedFilters);
     const structuredRely = buildFacebookElements(
         originMeta.slugs[0],
         destinationMeta.slugs[0],
         sessionCookie,
         shortUrl,
-        sortedTrips
+        results
     );
     // console.log('structuredRely', JSON.stringify(structuredRely));
 
-    const results = sortedTrips.length
-        ? sortedTrips
-        : null;
+
     const textReply = replies.trip.filteredDepartureList(
         origin,
         destination,
@@ -308,7 +401,8 @@ const tripDialogReply = context => {
             timeFilterFrom: null,
             timeFilterTo: null,
             busTypeFilters: btfValues,
-            priceFilter
+            priceFilter,
+            excludedFilters
         }
     );
     return {
