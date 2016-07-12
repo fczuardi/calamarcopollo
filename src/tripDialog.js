@@ -221,7 +221,7 @@ const tripDialogReply = context => {
                 timeFilter.from && timeFilter.from.grain !== 'day') {
         // Filter trips after a day time
         const filteredTripsAfter = sortedTrips.filter(trip =>
-            trip.departureTime.isAfter(timeFilter.from.value)
+            trip.departureTime.isSameOrAfter(timeFilter.from.value)
         );
 
         if (timeFilter.to === null) {
@@ -254,7 +254,7 @@ const tripDialogReply = context => {
         }
         // Filter trips after a day time and before another time
         const filteredTripsBetween = filteredTripsAfter.filter(trip =>
-            trip.departureTime.isBefore(timeFilter.to.value)
+            trip.departureTime.isSameOrBefore(timeFilter.to.value)
         );
         const structuredRely = buildFacebookElements(
             originMeta.slugs[0],
