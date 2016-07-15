@@ -4,13 +4,24 @@ import { extractEntities } from '../fuzzy';
 import { WitDriver } from 'calamars';
 const { getEntityValue, getEntityMeta } = WitDriver;
 
-const placesConfidenceThreshold = 0.77;
+const confidence = 0.77;
+const confidenceToFillContext = 0.7;
 
-const checkConfidences = ({ origin, destination, unknownPlace }) => {
-    const hasDestination = (destination && destination.confidence >= placesConfidenceThreshold);
-    const hasOrigin = (origin && origin.confidence >= placesConfidenceThreshold);
+const checkConfidences = ({ origin, destination, unknownPlace }, context) => {
+    const hasContext = context !== undefined;
+    const destNotInContext = hasContext && !context.destination;
+    const originNotInContext = hasContext && !context.origin;
+    const placesNotInContext = hasContext && (
+        context.origin && !context.destination ||
+        context.destination && !context.origin
+    );
+    const destConfidence = destNotInContext ? confidenceToFillContext : confidence;
+    const originConfidence = originNotInContext ? confidenceToFillContext : confidence;
+    const placeConfidence = placesNotInContext ? confidenceToFillContext : confidence;
+    const hasDestination = (destination && destination.confidence >= destConfidence);
+    const hasOrigin = (origin && origin.confidence >= originConfidence);
     const hasUnknownPlace = (
-        unknownPlace && unknownPlace.confidence >= placesConfidenceThreshold
+        unknownPlace && unknownPlace.confidence >= placeConfidence
     );
     return { hasDestination, hasOrigin, hasUnknownPlace };
 };
@@ -24,12 +35,14 @@ const routes = [[
         } = checkConfidences({
             origin, destination, unknownPlace
         });
+        // console.log('no trip match function result', hasTripIntent, hasDestination, hasOrigin, hasUnknownPlace)
         return hasTripIntent
             || hasDestination
             || hasOrigin
             || hasUnknownPlace;
     },
     (outcomes, { store, chat } = {}) => {
+        // console.log('---- trip intent ---');
         const {
             origin,
             origins,
@@ -53,17 +66,17 @@ const routes = [[
         if (priceFilter) {
             nextContext.priceFilter = priceFilter;
         }
-        if (destination && destination.confidence >= placesConfidenceThreshold) {
+        if (destination && destination.confidence >= confidence) {
             nextContext.destination = destination.value;
             nextContext.destinationMeta = destinationMeta;
         }
-        if (origin && origin.confidence >= placesConfidenceThreshold) {
+        if (origin && origin.confidence >= confidence) {
             nextContext.origin = origin.value;
             nextContext.originMeta = originMeta;
             if (!destination) {
                 if (
                     origins && origins.length > 1 &&
-                    origins[1].confidence >= placesConfidenceThreshold
+                    origins[1].confidence >= confidence
                 ) {
                     nextContext.destination = origins[1].value;
                     nextContext.destinationMeta = getEntityMeta(origins[1]);
@@ -74,7 +87,7 @@ const routes = [[
             }
         }
         if (!origin && !destination && unknownPlaces && unknownPlaces.length > 1) {
-            console.log('[issue #25]: 2 places and no role');
+            // console.log('[issue #25]: 2 places and no role');
             nextContext.origin = unknownPlaces[0].value;
             nextContext.originMeta = getEntityMeta(unknownPlaces[0]);
             nextContext.destination = unknownPlaces[1].value;
@@ -99,32 +112,7 @@ const routes = [[
         return tripDialogReply(nextContext);
     }
 ], [
-    outcomes => {
-        const {
-            unknownPlace,
-            origin,
-            destination,
-            busTypeFilters,
-            priceFilter,
-            timeFilter
-        } = extractEntities(outcomes);
-        const {
-            hasDestination, hasOrigin, hasUnknownPlace
-        } = checkConfidences({
-            origin, destination, unknownPlace
-        });
-
-        const result = (
-            hasDestination ||
-            hasOrigin ||
-            hasUnknownPlace ||
-            busTypeFilters ||
-            priceFilter ||
-            timeFilter
-        );
-        return result;
-    },
-    (outcomes, { store, chat } = {}) => {
+    (outcomes, { chat } = {}) => {
         const context = chat && chat.session ? chat.session : {};
         const {
             unknownPlace,
@@ -138,7 +126,34 @@ const routes = [[
             hasDestination, hasOrigin, hasUnknownPlace
         } = checkConfidences({
             origin, destination, unknownPlace
-        });
+        }, context);
+
+        const result = (
+            hasDestination ||
+            hasOrigin ||
+            hasUnknownPlace ||
+            busTypeFilters ||
+            priceFilter ||
+            timeFilter
+        );
+        return result;
+    },
+    (outcomes, { store, chat } = {}) => {
+        // console.log('---- no trip intent ---');
+        const context = chat && chat.session ? chat.session : {};
+        const {
+            unknownPlace,
+            origin,
+            destination,
+            busTypeFilters,
+            priceFilter,
+            timeFilter
+        } = extractEntities(outcomes);
+        const {
+            hasDestination, hasOrigin, hasUnknownPlace
+        } = checkConfidences({
+            origin, destination, unknownPlace
+        }, context);
         const unknownPlaceMeta = getEntityMeta(unknownPlace);
         let nextContext = Object.assign({}, context);
         if (timeFilter) {
