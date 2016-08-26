@@ -30,7 +30,10 @@ const DEBUG_TO_LOGFILE = process.env.DEBUG_TO_LOGFILE;
 const POLLO_PATH = process.env.POLLO_PATH;
 
 const store = createStore();
-const onUpdate = async ({ bot, update }) => {
+const updateListenerConfig = {
+    googleUrl
+};
+const setupUpdateListener = config => async ({ bot, update }) => {
     const message = calamarMessageFormat(update);
     const { chatId, senderId } = message;
     const messageText = message.text;
@@ -60,7 +63,6 @@ const onUpdate = async ({ bot, update }) => {
         sendMessageOptions = { disable_web_page_preview: 'true', chat_id: chatId };
         from = update.message.from;
     }
-
     const witResult = await wit.query(text, true);
     /* eslint-disable no-underscore-dangle */
     const { _text, outcomes } = witResult;
@@ -210,18 +212,21 @@ const onUpdate = async ({ bot, update }) => {
         // console.log('trips', trips);
         // console.log(`trips[0]: ${JSON.stringify(trips[0])}`);
 
-        const srcSlug = context.originMeta.slugs[0];
-        const destSlug = context.destinationMeta.slugs[0];
+        const srcSlug = context.originMeta ? context.originMeta.slugs[0] : null;
+        const destSlug = context.destinationMeta ? context.destinationMeta.slugs[0] : null;
         const webUrl = `${CLICKBUS_WEB_URL}/${srcSlug}/${destSlug}/?${CLICKBUS_UTM_PARAMS}`;
         const url = `${webUrl}&${CLICKBUS_WEB_URL_DATE_PARAM}=${reply.departureDay}`;
 
         console.log(`shortening the web url ${url}…`);
         const secondReply = await new Promise(resolve => {
-            googleUrl.shorten(url, (err, shortUrl) => {
+            config.googleUrl.shorten(url, (err, shortUrl) => {
+                if (err) {
+                    console.error('URL shortening failed');
+                }
                 console.log('URL shortened', shortUrl);
                 const nextContext = Object.assign({}, context, {
                     trips,
-                    shortUrl,
+                    shortUrl: (err ? url : shortUrl),
                     sessionCookie
                 });
                 return resolve(tripDialogReply(nextContext));
@@ -307,9 +312,13 @@ const onPostback = ({ update, bot }) => {
     });
 };
 
+const onUpdate = setupUpdateListener(updateListenerConfig);
 const port = process.env.PORT;
 const callbackPath = process.env.FB_CALLBACK_PATH;
-const listeners = { onUpdate, onPostback };
+const listeners = {
+    onUpdate,
+    onPostback
+};
 const staticFiles = [
     { path: process.env.POST_TO_CLICKBUS_HACK_PATH, file: `${POLLO_PATH}/src/autopost.html` }
 ];
@@ -337,3 +346,7 @@ fbBot.launchPromise.then(serverStatus => {
 });
 
 tgBot.on('update', update => onUpdate({ bot: tgBot, update }));
+
+export {
+    setupUpdateListener
+};
