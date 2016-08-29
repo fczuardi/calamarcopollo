@@ -51,6 +51,10 @@ const interaction = {
     ],
     // End of an interaction
     close: [
+        'Tchau.'
+    ],
+    // End of an interaction
+    thanks: [
         'Obrigado.',
         'Tchau.',
         'Valeu bot!'

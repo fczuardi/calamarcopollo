@@ -78,10 +78,11 @@ const greetingWithUsername = async t => {
 const goodbye = async t => {
     const expressions = interaction.close;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
+    const extraParams = { store, chat: { id: 12345 }, date: Date.now() };
     return outcomes.forEach((outcome, i) => t.is(
-        router(outcome), replies.close(),
-        `Expression: ${expressions[i]}`
-    ));
+        router(outcome, extraParams), replies.close(),
+        `Expression: ${expressions[i]}`)
+    );
 };
 
 // # Trips
@@ -190,7 +191,7 @@ const tripOriginDestinationDepartureTime = async t => {
 
 const routerPlaceWithNoRoleNoTripInfo = async t => {
     const outcome = { entities: {
-        places: [{ value: 'Sertãozinho' }]
+        places: [{ value: 'Sertãozinho', confidence: 0.9 }]
     } };
     t.is(router(outcome), replies.trip.noOrigin());
 };

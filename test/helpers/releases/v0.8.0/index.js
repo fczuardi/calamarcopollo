@@ -70,6 +70,7 @@ const interactionHowAreYouWit = async t => {
     ));
 };
 
+// places that should have meta
 const knowCitiesWithSlug = async t => {
     const expressions = bugs.shouldHaveMeta;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
@@ -111,7 +112,7 @@ const faqMiado = async t => {
     const expressions = faq.miado;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        outcome.entities.faq[0].value, 'miado',
+        outcome.entities.personality[0].value, 'miado',
         `Expression: ${expressions[i]}`)
     );
 };
@@ -120,7 +121,7 @@ const faqCat = async t => {
     const expressions = faq.cat;
     const outcomes = await Promise.all(expressions.map(s => getOutcome(s)));
     return outcomes.forEach((outcome, i) => t.is(
-        outcome.entities.faq[0].value, 'cat',
+        outcome.entities.personality[0].value, 'cat',
         `Expression: ${expressions[i]}`)
     );
 };

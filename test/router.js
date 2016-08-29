@@ -86,8 +86,12 @@ test('[0.3.0] /restart command with wit', restartCommand);
 //
 // # Interactions
 test('interaction close', t => {
+    const extraParams = { store, chat: { id: 12345 }, date: Date.now() };
     t.is(
-        router({ entities: { interaction: [{ value: 'close' }] } }),
+        router(
+            { entities: { interaction: [{ value: 'close' }] } },
+            extraParams
+        ),
         replies.close()
     );
 });
