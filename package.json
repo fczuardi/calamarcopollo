@@ -70,7 +70,7 @@
     "fake-clickbus-api": "^0.1.31",
     "fuse.js": "^2.2.0",
     "google-url": "0.0.4",
-    "latinize": "^0.2.0",
+    "latinize": "^0.3.0",
     "moment": "^2.13.0",
     "redux": "^3.5.2",
     "telegram-bot-api": "^1.1.0"
