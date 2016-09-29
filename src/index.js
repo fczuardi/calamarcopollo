@@ -327,7 +327,7 @@ const fbBot = new FacebookMessengerBot({ port, callbackPath, listeners, staticFi
 console.log(moment().format());
 
 //
-fbBot.launchPromise.then(serverStatus => {
+fbBot.start().then(serverStatus => {
     console.log('serverStatus', serverStatus, port);
 
     // Get Started button reply
