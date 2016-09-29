@@ -72,7 +72,7 @@
     "google-url": "0.0.4",
     "moment": "^2.15.1",
     "latinize": "^0.3.0",
-    "redux": "^3.5.2",
+    "redux": "^3.6.0",
     "telegram-bot-api": "^1.1.0"
   }
 }
