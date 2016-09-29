@@ -18,7 +18,7 @@ export default function (state, action) {
     const { text, chat, date } = payload || {};
     const chatId = chat && chat.id ? chat.id : null;
     const expressionIndex = state.expressions.findIndex(t => t === text);
-    const outcomeIndex = state.outcomes.findIndex(item => item.text === text);
+    const outcomeIndex = state.outcomes.findIndex(item => item && item.text === text);
     const chatIndex = state.chats.findIndex(item => item.id === chatId);
     const oldChat = chatIndex >= 0 ? state.chats[chatIndex] : null;
     const lastDate = oldChat ? oldChat.date : Date.now();

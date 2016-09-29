@@ -66,7 +66,7 @@
     "shelljs": "^0.7.4"
   },
   "dependencies": {
-    "calamars": "^0.17.2",
+    "calamars": "^0.17.3",
     "fake-clickbus-api": "^0.1.31",
     "fuse.js": "^2.5.0",
     "google-url": "0.0.4",

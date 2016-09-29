@@ -37,11 +37,11 @@ const updateListenerConfig = {
 const getSession = chatId => {
     const currentChat = store.getState().chats.find(item => item.id === chatId);
     return currentChat.session;
-}
+};
 
 const setupUpdateListener = config => async ({ bot, update }) => {
     const message = calamarMessageFormat(update);
-    if (!message.text || message.isEcho) {
+    if (!message || !message.text || message.isEcho) {
         // console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
         return null;
     }
