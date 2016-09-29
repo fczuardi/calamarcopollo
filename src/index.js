@@ -33,15 +33,21 @@ const store = createStore();
 const updateListenerConfig = {
     googleUrl
 };
+
+const getSession = chatId => {
+    const currentChat = store.getState().chats.find(item => item.id === chatId);
+    return currentChat.session;
+}
+
 const setupUpdateListener = config => async ({ bot, update }) => {
     const message = calamarMessageFormat(update);
+    if (!message.text || message.isEcho) {
+        // console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
+        return null;
+    }
     const { chatId, senderId } = message;
     const messageText = message.text;
     const date = message.timestamp;
-    if (!messageText) {
-        console.log(`Update: ${JSON.stringify(update, ' ', 2)}`);
-        return null;
-    }
     const text = polloSanitize(messageText);
     console.log(`
         Message: ${messageText}
@@ -55,14 +61,25 @@ const setupUpdateListener = config => async ({ bot, update }) => {
     const botType = message.platform;
 
     let sendMessageOptions;
+    let context = getSession(chatId);
     let from;
     if (botType === 'facebookMessenger') {
         sendMessageOptions = { userId: senderId };
-        from = await bot.getUserInfo(senderId);
+        if (!context.user) {
+            from = await bot.getUserInfo(senderId).catch(e => {
+                console.log('getUserInfo error:', e.message);
+            });
+        }
     } else {
         sendMessageOptions = { disable_web_page_preview: 'true', chat_id: chatId };
-        from = update.message.from;
+        if (!context.user) {
+            from = update.message.from;
+        }
     }
+    store.dispatch(updateChatSession({
+        chat: { ...chat, session: { ...context, user: from } }
+    }));
+
     const witResult = await wit.query(text, true);
     /* eslint-disable no-underscore-dangle */
     const { _text, outcomes } = witResult;
@@ -73,16 +90,17 @@ const setupUpdateListener = config => async ({ bot, update }) => {
     console.log('outcome', JSON.stringify(outcome));
     console.log('chat, from, date', chat, from, date);
     const reply = router(outcome, { store, chat, from, date });
+    // router has side-effects and modifies context,
+    // that's why we get it again here
+    context = getSession(chatId);
     store.dispatch(updateOutcome(outcome));
-    const currentChat = store.getState().chats.find(item => item.id === chat.id);
-    const context = currentChat.session;
     if (typeof reply === 'string') {
         console.log('reply', reply);
         console.log('context', context);
         bot.sendMessage({
             ...sendMessageOptions,
             text: reply
-        });
+        }).catch(e => {console.log('sendMessage error:', e.message)});
         // @TODO remove unknown place from context if the bot replied
         // with the noSlug answer
         if (!context.destinationMeta || !context.originMeta) {
@@ -91,7 +109,7 @@ const setupUpdateListener = config => async ({ bot, update }) => {
                 destination: !context.destinationMeta ? undefined : context.destination,
                 origin: !context.originMeta ? undefined : context.origin
             };
-            console.log('remove place?', nextContext);
+            console.log('## nextContext ##', nextContext);
             store.dispatch(updateChatSession({
                 chat: { ...chat, session: nextContext }
             }));
@@ -335,13 +353,19 @@ fbBot.start().then(serverStatus => {
         text: replies.start()
     }).then(welcomeMsgSetResult =>
         console.log('welcomeMsgSetResult', welcomeMsgSetResult)
-    );
+    ).catch(e => {
+        console.log('\nFailed to setup Get Started Button');
+        console.error(e.message);
+    });
 
     // Persistent Menu
     fbBot.setThreadSettings({
         type: 'call_to_actions',
         state: 'existing_thread',
         cta: menu
+    }).catch(e => {
+        console.log('\nFailed to setup Persistent Menu');
+        console.error(e.message);
     });
 });
 
