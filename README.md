@@ -49,12 +49,13 @@ cp node_modules/calamarcopollo/replies/custom.js ./custom-replies.js
 source .env
 ```
 
-## License AGPL v3.0
+## License MIT 
 
-Copyright (c) 2016 Fabricio C Zuardi
+Copyright (c) 2016 Fabricio C Zuardi and CalamarcoPollo [AUTHORS][authors]
 
-This software is distributed under the [GNU AFFERO GENERAL PUBLIC LICENSE version 3][license].
+This software is distributed under the [MIT License][license].
 
+[authors]: https://github.com/calamar-io/calamarcopollo/blob/master/AUTHORS 
 [calamars]: https://github.com/calamar-io/calamars
 [telegram]: https://telegram.org/
 [demobot]: https://telegram.me/calamarcopollo_demo_bot
@@ -62,4 +63,4 @@ This software is distributed under the [GNU AFFERO GENERAL PUBLIC LICENSE versio
 [fblink]: http://m.me/1782353951999287
 [statements]: http://fczuardi.github.io/calamarcopollo/statements.html
 [defaultreplies]: https://github.com/fczuardi/calamarcopollo/blob/master/replies/index.js#L19-L63
-[license]: https://raw.githubusercontent.com/fczuardi/calamarcopollo/master/LICENSE
+[license]: https://github.com/calamar-io/calamarcopollo/blob/master/LICENSE
