@@ -60,7 +60,7 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.16.0",
     "babel-plugin-transform-object-rest-spread": "^6.16.0",
     "docco": "^0.7.0",
-    "eslint": "^3.6.1",
+    "eslint": "^3.10.2",
     "eslint-config-calamar": "^2.1.1",
     "gh-pages": "^0.11.0",
     "shelljs": "^0.7.4"
