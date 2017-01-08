@@ -63,7 +63,7 @@
     "eslint": "^3.6.1",
     "eslint-config-calamar": "^2.1.1",
     "gh-pages": "^0.11.0",
-    "shelljs": "^0.7.4"
+    "shelljs": "^0.7.6"
   },
   "dependencies": {
     "calamars": "^0.17.3",
